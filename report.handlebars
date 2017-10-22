@@ -1,0 +1,30 @@
+{{!-- Copyright 2017 Aldrin J D'Souza. --}}
+{{!-- Licensed under the MIT License <https://opensource.org/licenses/MIT> --}}
+
+{{!-- The default Markdown report format --}}
+{{#if title }}
+## {{ title }} ({{ date }})
+
+{{/if ~}}
+
+{{!-- Headlines  --}}
+### Summary
+{{#each commits }}
+- {{#if number }}[#{{ number }}]{{/if}} {{{ summary ~}}}
+
+{{/each ~}}
+
+{{!-- Changes scope --}}
+{{~#each scopes}}
+
+{{#if title}}### {{{ title }}}{{/if}}
+{{~#each categories }}
+{{#if title}}#### {{{ title }}}{{/if}}
+{{#each changes }}
+- {{{ opening ~}}}
+  {{#each rest }}
+    {{{ . ~}}}
+  {{/each}}
+{{/each}}
+{{/each}}
+{{/each}}

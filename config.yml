@@ -1,0 +1,60 @@
+# Copyright 2017 Aldrin J D'Souza.
+# Licensed under the MIT License <https://opensource.org/licenses/MIT>
+
+# The default out-of-the-box configuration file for git-changelog.  This configuration can be
+# overridden using the `-c` or `--config` command line parameter.
+
+## Project Conventions
+# Change categorization
+categories:
+
+  # The tags used to categorize changes in commit messages.
+  # The order here, determines the order these appear in the final report.
+  # If a tag is not on this list, it won't show up in the final report.
+  tags:
+    - break
+    - security
+    - feature
+    - add
+    - remove
+    - fix
+    - note
+    - deprecate
+
+  # The category for all untagged changes.
+  default: note
+
+  # The "pretty names" for the tags as they appear in the final report.
+  titles:
+    fix: Fixes
+    note: Notes
+    add: Additions
+    remove: Removals
+    feature: Features
+    deprecate: Deprecations
+    break: Breaking Changes
+    security: Security Updates
+
+scopes:
+
+  # The tags used to scope changes in commit messages
+  # The order here, determines the order these appear in the final report.
+  # If a tag is not on this list, it won't show up in the final report.  
+  tags:
+    - default
+    - api
+    - doc
+
+  # The scope for all untagged changes
+  default: default
+
+  # The "pretty names" for the tags as they appear in the final report.
+  titles:
+    api: API
+    default: ""
+    doc: Documentation
+
+## Report Configuration
+report:
+  title: "CHANGELOG"
+  date_format: "%Y-%m-%d"

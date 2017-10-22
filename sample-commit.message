@@ -1,0 +1,56 @@
+Demonstrate tagging conventions for commit messages (#4)
+
+This commit message is long to demonstrate the tool features. Follow the
+usual [guidance](https://chris.beams.io/posts/git-commit/) on writing
+commit messages for *real* commits. The only additional (optional)
+conventions this tool introduces are tagging prefixes described here.
+
+- feature: **Categorized Changes:** Lines that begin with a `- <tag>:`
+  can be used to categorize changes. Everything that follow a the prefix
+  is tagged with the chosen category. For example, this text describes
+  the tool feature that categorizes changes. Among others, `feature` is
+  an out-of-the-box tag. You can define tags that make sense for your
+  project.
+
+- feature: **Scoped Changes**: For larger projects, you can introduce
+another level of organization using *scopes* (e.g. `API`,
+`Documentation`, `Benchmarks`, etc.) To specify a scope, use the `-
+tag(scope):` prefix as done by the next item. Lines that don't specify a
+`scope` like this or the previous item fall into the `default` scope. As
+with tags, you can define scopes that make sense for your project (or
+not use them at all).
+
+- break(API): This line and all that follow will show up under a
+"Breaking Changes" section in the "API" scope of the project. Once you
+tag a line, all lines that follow use the same categorization. You're
+free to write whatever you like.  Markdown is fine too. For example, for
+a breaking change, I can itemize things like:
+
+ - **Why** I broke the API.
+ - **What** you should do about it.
+
+Or even put code snippets like this:
+
+```rust
+/// A single line in the change message
+#[derive(Serialize, Default, Debug)]
+pub struct Line {
+    /// The scope
+    pub scope: Option<String>,
+    /// The category
+    pub category: Option<String>,
+    /// The text
+    pub text: Option<String>,
+}
+```
+
+- chore: When you re-tag, as done in this line, you reset the
+  categorization and start a fresh item again. Sometimes you want to
+  record things in the commit message but don't want it to show up in
+  the changelog. You can do that by using a tags that is not on the
+  report tags list in the configuration.  For example, I use the
+  `chore:` tag to record maintenance or housekeeping tasks. None of this
+  paragraph will show up in the report.
+
+- braek: Be careful with tag spellings, for example, misspelled tags are
+  ignored and skipped.
