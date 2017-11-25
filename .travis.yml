@@ -3,7 +3,10 @@ rust:
   - stable
   - beta
   - nightly
-cache: cargo  
+cache: cargo
+os:
+  - linux
+  - osx
 matrix:
   allow_failures:
     - rust: nightly
