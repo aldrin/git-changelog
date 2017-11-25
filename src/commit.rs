@@ -42,7 +42,7 @@ pub fn parse(lines: &[String], dt_format: &str) -> Commit {
         number: parse_number(&lines[3]),
         summary: parse_subject(&lines[3]),
         time: parse_time(&lines[2], dt_format),
-        lines: lines[4..].iter().map(|s| parse_line(&s)).collect(),
+        lines: lines[4..].iter().map(|s| parse_line(s)).collect(),
     }
 }
 
