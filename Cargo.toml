@@ -1,5 +1,5 @@
 [package]
-version      = "0.1.0"
+version      = "0.1.1"
 name         = "git-changelog"
 authors      = ["Aldrin J D'Souza <mail@aldrin.co>"]
 description  = "A tool to automate project changelog generation."
