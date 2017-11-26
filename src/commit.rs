@@ -83,13 +83,15 @@ pub fn parse_line(line: &str) -> Line {
     }
 }
 
-/// Consume whatever is left and return a String
-named!(whatever<&str, String>,
-       map!(take_while1_s!(|_| true), String::from));
-
-/// Consume an acceptable tag name and return a String
-named!(tagname<&str, String>,
-       map!(ws!(take_while1_s!(|c| is_alphanumeric(c as u8))), str::to_lowercase));
+/// A change line is one of the known types
+named!(tagged_change<&str, Line>,
+       alt!(
+           category_scope_change
+               | category_scope
+               | category_change
+               | just_category
+               | just_change
+       ));
 
 /// A line that has everything, i.e. category, scope and a change.
 named!(category_scope_change<&str, Line>,
@@ -137,32 +139,21 @@ named!(category_change<&str, Line>,
                    text: Some(text),
                })));
 
-/// A line that starts a new item without tags
-named!(new_change<&str, Line>,
-       do_parse!(
-           tag!("-") >> text: whatever >>
-               (Line{
-                   scope: None,
-                   category: None,
-                   text: Some(text),
-               })));
-
 /// A line that has just a simple change (no tags).
 named!(just_change<&str, Line>,
-       do_parse!(text: whatever >>
+       do_parse!(opt!(ws!(tag!("-"))) >>
+                 text: whatever >>
                  (Line{
                      scope: None,
                      category: None,
                      text: Some(text),
                  })));
 
-/// A change line is one of the known types
-named!(tagged_change<&str, Line>,
-       alt!(
-           category_scope_change
-               | category_scope
-               | category_change
-               | just_category
-               | new_change
-               | just_change
-       ));
+/// Consume whatever is left and return a String
+named!(whatever<&str, String>,
+       map!(take_while1_s!(|_| true), String::from));
+
+/// Consume an acceptable tag name and return a String
+named!(tagname<&str, String>,
+       map!(ws!(take_while1_s!(|c| is_alphanumeric(c as u8))), str::to_lowercase));
+

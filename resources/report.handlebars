@@ -3,12 +3,12 @@
 
 {{!-- The default Markdown report format --}}
 {{#if title }}
-## {{ title }} ({{ date }})
+### {{ title }} ({{ date }})
 
 {{/if ~}}
 
 {{!-- Headlines  --}}
-### Summary
+#### Summary
 {{#each commits }}
 - {{#if number }}[#{{ number }}]{{/if}} {{{ summary ~}}}
 
@@ -17,9 +17,9 @@
 {{!-- Changes scope --}}
 {{~#each scopes}}
 
-{{#if title}}### {{{ title }}}{{/if}}
-{{~#each categories }}
 {{#if title}}#### {{{ title }}}{{/if}}
+{{~#each categories }}
+{{#if title}}##### {{{ title }}}{{/if}}
 {{#each changes }}
 - {{{ opening ~}}}
   {{#each rest }}

@@ -53,7 +53,7 @@ fn commit_parse_line() {
     let line = parse_line("- foo bar");
     assert_eq!(None, line.scope);
     assert_eq!(None, line.category);
-    assert_eq!(Some(String::from(" foo bar")), line.text);
+    assert_eq!(Some(String::from("foo bar")), line.text);
 
     let line = parse_line("foo bar");
     assert_eq!(None, line.scope);
@@ -68,7 +68,7 @@ fn fake_commit() -> super::commit::Commit {
         "aaaaaa a a'aaaaa",
         "Sun, 22 Oct 2017 17:26:56 -0400",
     ];
-    let message = include_str!("../sample-commit.message").lines();
+    let message = include_str!("../resources/sample-commit.message").lines();
 
     let mut lines: Vec<String> = Vec::new();
     for l in header {
@@ -105,6 +105,7 @@ fn prepare_report() {
     let config = config::from(None).unwrap();
     let report = report::generate(&commits, &config);
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
+    println!("{}", report::render(&report, &config));
     assert_eq!(report.commits.len(), 1);
     assert_eq!(report.scopes.len(), 2);
     assert!(!report.title.is_empty());

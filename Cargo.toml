@@ -1,23 +1,31 @@
 [package]
-version       = "0.1.0-nightly"
-name          = "git-changelog"
-authors       = ["Aldrin J D'Souza <mail@aldrin.co>"]
+version      = "0.1.0"
+name         = "git-changelog"
+authors      = ["Aldrin J D'Souza <mail@aldrin.co>"]
+description  = "A tool to automate project changelog generation."
+license      = "MIT"
+homepage     = "https://github.com/aldrin/git-changelog"
+repository   = "https://github.com/aldrin/git-changelog"
+readme       = "README.md"
 
 [dependencies]
-log           = "0.3"
-nom           = "3.2"
-clap          = "2.26"
-serde         = "1.0"
-chrono        = "0.4"
-handlebars    = "0.29"
-env_logger    = "0.3"
-serde_yaml    = "0.7"
-serde_json    = "1.0"
-serde_derive  = "1.0"
+log          = "0.3"
+nom          = "3.2"
+clap         = "2.26"
+serde        = "1.0"
+chrono       = "0.4"
+handlebars   = "0.29"
+env_logger   = "0.3"
+serde_yaml   = "0.7"
+serde_json   = "1.0"
+serde_derive = "1.0"
 
 [lib]
-name          = "changelog"
+name         = "changelog"
 
 [[bin]]
-name          = "git-changelog"
-doc           = false
+name         = "git-changelog"
+doc          = false
+
+[badges]
+travis-ci    = {repository= "aldrin/git-changelog" }
