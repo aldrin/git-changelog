@@ -47,7 +47,7 @@ pub struct ReportConfiguration {
 /// Initialize configuration from the given file or the default.
 pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
     let cfg = match filename {
-        None => serde_yaml::from_str(include_str!("../config.yml")),
+        None => serde_yaml::from_str(include_str!("../resources/config.yml")),
         Some(file) => serde_yaml::from_reader(File::open(file)?),
     };
 
@@ -62,7 +62,7 @@ pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
 
     // Read the template
     let template = if config.report.template.is_empty() {
-        String::from(include_str!("../report.handlebars"))
+        String::from(include_str!("../resources/report.handlebars"))
     } else {
         let mut template = String::new();
         let file = File::open(config.report.template)?;
