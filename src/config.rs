@@ -3,70 +3,66 @@
 
 use serde_yaml;
 use std::fs::File;
-use commit::{Commit, Line};
+use commit::Commit;
 use handlebars::Handlebars;
-use std::collections::HashMap;
+use serde_json::to_string_pretty;
 use std::io::{Error, ErrorKind, Read, BufReader};
+
+/// A tag definition
+#[serde(default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct Tag {
+    /// The identifying keyword
+    pub keyword: String,
+    /// The report heading
+    pub title: String,
+}
 
 /// The tool configuration structure (can be specified in a file)
 #[serde(default)]
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Configuration {
     /// The change category configuration
-    pub categories: TagConfiguration,
+    pub categories: Vec<Tag>,
     /// The change scope configuration
-    pub scopes: TagConfiguration,
-    /// The report configuration
-    pub report: ReportConfiguration,
-}
-
-/// Configuration of scopes and categories
-#[serde(default)]
-#[derive(Serialize, Deserialize, Default)]
-pub struct TagConfiguration {
-    /// The tags that identify the item.
-    pub tags: Vec<String>,
-    /// A mapping from the tag to the readable title in reports.
-    pub titles: HashMap<String, String>,
-    /// The default tag to use if none is specified
-    pub default: String,
-}
-
-/// Report configuration
-#[serde(default)]
-#[derive(Serialize, Deserialize, Default)]
-pub struct ReportConfiguration {
+    pub scopes: Vec<Tag>,
     /// The report title
     pub title: String,
-    /// The report template
+    /// The report template file
     pub template: String,
     /// The date format
     pub date_format: String,
 }
 
-/// Initialize configuration from the given file or the default.
+/// Initialize configuration from the given file or use the default.
 pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
-    let cfg = match filename {
-        None => serde_yaml::from_str(include_str!("../resources/config.yml")),
-        Some(file) => serde_yaml::from_reader(File::open(file)?),
-    };
 
-    let mut config: Configuration = cfg.map_err(|e| {
-        error!(
-            "Invalid configuration file '{}', {}.",
-            filename.unwrap_or("default"),
-            e
-        );
+    // Take the given filename
+    let mut config: Configuration = match filename {
+
+        // If none is given, initialize from the embedded default
+        None => serde_yaml::from_str(include_str!("../resources/config.yml")),
+
+        // If some file is given, read it and deserialize into the config structure
+        Some(file) => serde_yaml::from_reader(File::open(file)?),
+    }.map_err(|e| {
+        // Inform and get out
+        error!("Invalid configuration file '{:?}', {}.", filename, e);
         Error::from(ErrorKind::InvalidInput)
     })?;
 
-    // Read the template
-    let template = if config.report.template.is_empty() {
+    // Read the template in the effective configuration
+    let template = if config.template.is_empty() {
+
+        // If empty, initialize from the embedded default
         String::from(include_str!("../resources/report.handlebars"))
     } else {
+        // Have a file name, read it fully
         let mut template = String::new();
-        let file = File::open(config.report.template)?;
+        let file = File::open(config.template)?;
         BufReader::new(file).read_to_string(&mut template)?;
+
+        // And use as the template
         template
     };
 
@@ -74,96 +70,67 @@ pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
     Handlebars::new()
         .register_template_string("t", &template)
         .map_err(|e| {
+            // Syntax error, inform and get out
             error!("Invalid handlebar template: '{}'", e);
             Error::from(ErrorKind::InvalidInput)
         })?;
 
-    // All seems well, remember the text
-    config.report.template = template;
+    // Overwrite the template we'll use.
+    config.template = template;
 
-    // If we don't have a date format
-    if config.report.date_format.is_empty() {
-        config.report.date_format = String::from("%Y-%m-%d");
+    // If no data_format is specified
+    if config.date_format.is_empty() {
+
+        // Use a sensible default
+        config.date_format = "%Y-%m-%d".to_string()
     }
 
+    // Print the log
+    info!("CONFIG: {}", to_string_pretty(&config).unwrap());
+
+    // All good
     Ok(config)
 }
 
-impl Configuration {
-    /// Validate a line and replace its category and scope as configured
-    pub fn validate(&self, line: &Line) -> Line {
-        let text = line.text.clone();
-        let scope = self.scopes.validate(line.scope.clone());
-        let category = self.categories.validate(line.category.clone());
-        Line {
-            text,
-            category,
-            scope,
+/// Get the report title for a given tag
+pub fn report_title(tags: &[Tag], given: &Option<String>) -> Option<String> {
+    let given = given.clone().unwrap_or_default();
+    for tag in tags {
+        if tag.keyword == given {
+            return Some(tag.title.clone());
         }
     }
-
-    /// A commit is interesting if it has at least one line with an interesting scopes and category.
-    pub fn is_interesting(&self, commit: &Commit) -> bool {
-        for line in &commit.lines {
-            if line.text.is_none() {
-                continue;
-            }
-            if self.scopes.validate(line.scope.clone()).is_none() {
-                continue;
-            }
-            if self.categories.validate(line.category.clone()).is_none() {
-                continue;
-            }
-            return true;
-        }
-        info!("Commit {} is not interesting", commit.summary);
-        false
-    }
+    None
 }
 
-impl TagConfiguration {
-    /// Check if the given tag needs to be included into the report
-    pub fn validate(&self, given: Option<String>) -> Option<String> {
-        given
-            // If none is given, use configured default
-            .or_else(|| Some(self.default.clone()))
-            // Check if the tag is on the configured tag list
-            .and_then(|tag| if self.tags.iter().any(|t| t == &tag) {
-                // Yes, we can use it.
-                Some(tag)
-            } else {
-                // Unknown tag, can't use it.
-                None
-            })
+/// A commit is interesting if it has at least one line with an interesting scopes and category.
+pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
+
+    // Look at each line in the commit message
+    for line in &commit.lines {
+
+        // Ignore blank lines
+        if line.text.is_none() {
+            continue;
+        }
+
+        // Ignore lines with scopes that aren't meant to show up in the report
+        if report_title(&config.scopes, &line.scope).is_none() {
+            continue;
+        }
+
+        // Ignore lines with categories that aren't meant to show up in the report
+        if report_title(&config.categories, &line.category).is_none() {
+            continue;
+        }
+
+        // Has something of interest
+        return true;
     }
 
-    /// Get the title of the given item
-    pub fn get_title(&self, item: &str) -> String {
-        match self.titles.get(item) {
-            Some(text) => text,
-            None => item,
-        }.to_string()
-    }
+    // If we get here, we found nothing of interest in this commit
+    info!("Commit {} is not interesting", commit.summary);
 
-    /// Print the specification for visual inspection
-    pub fn show(&self, item: &str, warn_if_empty: bool) {
-        if self.tags.is_empty() {
-            if warn_if_empty {
-                warn!("No {} tags defined", item);
-            }
-        } else {
-            info!("Available {} tags: {:?}", item, self.tags);
-            if self.default.is_empty() {
-                warn!("No default {} tag defined.", item);
-            } else {
-                info!(r#"Using "{}" as the default {} tag"#, self.default, item);
-            }
-        }
-        for t in &self.tags {
-            match self.titles.get(t) {
-                None => warn!(r#"Title for {} tag "{}" is missing"#, item, t),
-                Some(title) => debug!(r#"Title for {} tag "{}" is "{}""#, item, t, title),
-            };
-        }
-    }
+    // Boring.
+    false
 }

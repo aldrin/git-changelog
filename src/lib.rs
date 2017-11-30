@@ -26,4 +26,5 @@ pub mod tool;
 pub mod commit;
 pub mod config;
 pub mod report;
+pub mod output;
 mod tests;

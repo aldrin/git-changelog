@@ -11,7 +11,7 @@ pub fn in_git_repository() -> Result<Output, Error> {
     git(&["rev-parse", "--is-inside-work-tree"])
 }
 
-/// Get the last tag, if no tags exist, go one commit back
+/// Get the last tag
 pub fn last_tag() -> Result<Option<String>, Error> {
     last_tags(1).map(|mut v| v.pop())
 }

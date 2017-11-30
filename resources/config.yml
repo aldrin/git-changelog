@@ -5,56 +5,37 @@
 # overridden using the `-c` or `--config` command line parameter.
 
 ## Project Conventions
-# Change categorization
+
+# The category tags and their titles.
+
+# Changes are grouped by title so you can put items tagged
+# with different keywords (e.g. break and braek) into the
+# same report section by giving them the same title.
+
+# Items tagged with keywords not on the list (e.g. chore)
+# will be skipped from the final report.
+
+# The item with an empty string keyword applies to lines
+# that have no explicit tags.
+
+# The order of tag definitions in the configuration controls
+# the order in which the tags
 categories:
+  - {keyword: "security", title: "Security Updates"}
+  - {keyword: "break", title: "Breaking Changes"}
+  - {keyword: "feature", title: "Features"}
+  - {keyword: "fix", title: "Fixes"}
+  - {keyword: "", title: "Notes"}
+  - {keyword: "add", title: "Additions"}
+  - {keyword: "remove", title: "Removals"}
+  - {keyword: "deprecate", title: "Deprecations"}
 
-  # The tags used to categorize changes in commit messages.
-  # The order here, determines the order these appear in the final report.
-  # If a tag is not on this list, it won't show up in the final report.
-  tags:
-    - break
-    - security
-    - feature
-    - add
-    - remove
-    - fix
-    - note
-    - deprecate
+# The scope tags and their titles.
 
-  # The category for all untagged changes.
-  default: note
-
-  # The "pretty names" for the tags as they appear in the final report.
-  titles:
-    fix: Fixes
-    note: Notes
-    add: Additions
-    remove: Removals
-    feature: Features
-    deprecate: Deprecations
-    break: Breaking Changes
-    security: Security Updates
-
+# The scope configuration follows the same conventions as
+# category. Remember that if you don't use scopes all items
+# are tagged under the default scope (i.e. keyword="").
 scopes:
-
-  # The tags used to scope changes in commit messages
-  # The order here, determines the order these appear in the final report.
-  # If a tag is not on this list, it won't show up in the final report.  
-  tags:
-    - default
-    - api
-    - doc
-
-  # The scope for all untagged changes
-  default: default
-
-  # The "pretty names" for the tags as they appear in the final report.
-  titles:
-    api: API
-    default: ""
-    doc: Documentation
-
-## Report Configuration
-report:
-  title: "CHANGELOG"
-  date_format: "%Y-%m-%d"
+  - {keyword: "", title: ""}
+  - {keyword: "api", title: "API"}
+  - {keyword: "doc", title: "Documentation"}

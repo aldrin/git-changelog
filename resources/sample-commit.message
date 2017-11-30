@@ -7,18 +7,18 @@ messages. The only additional (and optional) conventions this tool
 introduces are the tagging prefixes described here.
 
 - feature: *Categorized Changes:* Lines that begin with a `- <tag>:` can
-  be used to categorize changes. Everything that follows the prefix is
-  tagged with the chosen category. For example, this text describes the
-  tool feature that categorizes changes. Among others, `feature` is an
-  out-of-the-box tag defined in the [configuration](config.yml). You can
-  define tags that make sense for your project.
+be used to categorize changes. Everything that follows the prefix is
+tagged with the chosen category. For example, this text describes the
+tool feature that categorizes changes. Among others, `feature` is an
+out-of-the-box tag defined in the [configuration](config.yml). You can
+define tags that make sense for your project.
 
 - feature: *Scoped Changes:* For larger projects, the tool supports
 another level of organization using *scopes*. For example, projects can
 organize API changes under a `API` scope. To specify a scope, use the
-*`- tag(scope):`* prefix. When you don't specify a scope the item goes
-into the `default` scope. As with tags, you can define scopes that make
-sense for your project like `docs`, `benchmark`, etc. You can also
+*`- <tag>(<scope>):`* prefix. When you don't specify a scope the item
+goes into the `default` scope. As with tags, you can define scopes that
+make sense for your project like `docs`, `benchmark`, etc. You can also
 ignore them entirely and just use simple category tags.
 
 - break(API): This item is an example of a scoped *and* categorized

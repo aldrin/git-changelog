@@ -3,6 +3,7 @@
 
 use git;
 use report;
+use output;
 use commit;
 use config;
 
@@ -20,27 +21,35 @@ mod exit {
 
 /// The main tool entry-point
 pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> i32 {
+
     // First things first, are we even in a git repository?
     if git::in_git_repository().is_err() {
         return exit::NOT_GIT;
     }
 
-    // Inform the curious
-    config.categories.show("category", true);
-    config.scopes.show("scope", false);
-
     // Decide the revision range we'll use for the report
     let range = match given_range {
+
+        // The user gave one, use it
         Some(vec) => vec,
+
+        // None given
         None => {
+
+            // Start from the last known tag
             let from = match git::last_tag() {
                 Ok(Some(tag)) => tag,
                 _ => {
+                    // Go back one commit
                     warn!("No tags found, using HEAD^");
                     String::from("HEAD^")
                 }
             };
+
+            // Stop at HEAD
             let to = String::from("HEAD");
+
+            // The default range
             vec![format!("^{}", from), to]
         }
     };
@@ -62,6 +71,7 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
 
     // Go through each sha in range
     for sha in hashes.unwrap() {
+
         // Get the commit message for the commit
         let message = git::get_commit_message(&sha);
 
@@ -73,19 +83,19 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
         }
 
         // Parse the commit
-        let commit = commit::parse(&message.unwrap(), &config.report.date_format);
+        let commit = commit::parse(&message.unwrap(), &config.date_format);
 
         // If it is an interesting commit
-        if config.is_interesting(&commit) {
+        if config::is_interesting(config, &commit) {
             commits.push(commit);
         }
     }
 
     // Prepare the report
-    let report = report::generate(&commits, config);
+    let report = report::generate(config, &commits);
 
     // Show the report
-    println!("{}", report::render(&report, config));
+    output::render(config, &report);
 
     // Done
     exit::OK
