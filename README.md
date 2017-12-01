@@ -107,7 +107,7 @@ Github.
 
 [normally]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
-[Build Status]: (https://travis-ci.org/aldrin/git-changelog.svg?branch=master)
+[Build Status]: https://travis-ci.org/aldrin/git-changelog.svg?branch=master
 [commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
 [Homebrew]: https://brew.sh/
