@@ -8,13 +8,13 @@ this](resources/sample.md).
 ## Motivation
 
 Commit messages must always be meaningful and with a little extra effort we can automate the chore
-of generating meaningful change logs for end-users. As I finish up work on a change, I like to pause
-a while, consider what the change means to the end-user and reorganize the message a bit. If you
-follow the (easy) conventions described below and tag lines in the message appropriately, this tool
-will help you generate an *accurate* and *presentable* change log.
+of generating meaningful change logs for our users. As I finish up work on a change to a repository,
+I like to pause a while, consider what the change means to the end-user and reorganize the message a
+bit. If you follow the (easy) conventions described below and tag lines in your commit message
+appropriately, this tool will help you generate an *accurate* and *presentable* change log.
 
-A little time spent at the time of commit, when the context and impact of the change is fresh in
-mind, saves a lot of time at release milestones.
+A little time spent at commit, when the context and impact of the change is fresh in mind, saves a
+lot of time at release milestones.
 
 ## Installation
 
@@ -24,7 +24,7 @@ mind, saves a lot of time at release milestones.
 
 If you use a Mac with [Homebrew], you may prefer the following:
 
-```
+```bash
 > brew tap aldrin/tools
 > brew install git-changelog
 ```
@@ -32,7 +32,7 @@ If you use a Mac with [Homebrew], you may prefer the following:
 ## Usage
 
 Just write your commits as you [normally] do. When it looks like a particular commit includes a
-change that the "user" may be interested in, tag it appropriately.
+change that the "user" may be interested in, tag its lines appropriately.
 
 Concretely, instead of writing this:
 
@@ -58,10 +58,11 @@ Add support for filtering responses
   the new request parameter.
 ```
 
-They're both the same but the latter tags *user visible* changes diligently. Later, the tool picks
-up these tags, aggregates similar tags (e.g. breaking changes) across commits, orders them, and
-gives you a report that you can share, as is, with users. Or, you can use the output as the starting
-draft, make editorial changes and then share it. Either way, it saves you some time.
+The two commit messages are almost the same but the latter tags *user visible* changes a bit more
+diligently. Eventually, this diligence helps the tool to identify lines, aggregate similar things
+(e.g. breaking changes) across commits, order them, and give you a report that you can share, as is,
+with users. Or, you can use the output as the starting draft, make editorial changes and then share
+it with users. Either way, it saves you some time.
 
 Of course, you don't need to tag **every** commit (`git commit -m` is perfectly fine, where you
 think it is). You just need to tag the changes you want your users to know about. The quality of the
@@ -69,13 +70,12 @@ tool output depends on the quality of *your* input.
 
 ## Generate reports
 
-When `git-changelog` is on the path, `git changelog` works just like `git log` and takes the same
+When `git-changelog` is on the path, `git changelog` works just like `git log` and takes similar
 arguments. Concretely, it takes a [commit range] and looks for all commits in that range and uses
-the tags it finds to generate a report. Simple. :)
+the tags it finds in their messages to generate a report. Simple. :)
 
 ```bash
-> git changelog -h
-git-changelog (v0.1.0)
+git-changelog (v0.2.0)
 Aldrin J D'Souza <mail@aldrin.co>
 A tool to automate project changelog generation.
 
