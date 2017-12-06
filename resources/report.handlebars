@@ -2,11 +2,6 @@
 {{!-- Licensed under the MIT License <https://opensource.org/licenses/MIT> --}}
 
 {{!-- The default Markdown report format --}}
-{{#if title }}
-### {{ title }} ({{ date }})
-
-{{/if ~}}
-
 {{!-- Headlines  --}}
 #### Summary
 {{#each commits }}
@@ -21,9 +16,9 @@
 {{~#each categories }}
 {{#if title}}##### {{{ title }}}{{/if}}
 {{#each changes }}
-- {{{ opening ~}}}
+-{{{ opening ~}}}
   {{#each rest }}
-    {{{ . ~}}}
+  {{{ . ~}}}
   {{/each}}
 {{/each}}
 {{/each}}

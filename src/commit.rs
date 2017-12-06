@@ -75,7 +75,7 @@ pub fn parse_number(line: &str) -> Option<u32> {
     }
 }
 
-/// Parse an indvidiual line item
+/// Parse an individual message line
 pub fn parse_line(line: &str) -> Line {
     match tagged_change(line) {
         IResult::Done(_, l) => l,
@@ -83,7 +83,7 @@ pub fn parse_line(line: &str) -> Line {
     }
 }
 
-/// A change line is one of the known types
+/// A change message line is one of the following types
 named!(tagged_change<&str, Line>,
        alt!(
            category_scope_change
@@ -141,7 +141,7 @@ named!(category_change<&str, Line>,
 
 /// A line that has just a simple change (no tags).
 named!(just_change<&str, Line>,
-       do_parse!(opt!(ws!(tag!("-"))) >>
+       do_parse!(opt!(tag!("-")) >>
                  text: whatever >>
                  (Line{
                      scope: None,
@@ -156,4 +156,3 @@ named!(whatever<&str, String>,
 /// Consume an acceptable tag name and return a String
 named!(tagname<&str, String>,
        map!(ws!(take_while1_s!(|c| is_alphanumeric(c as u8))), str::to_lowercase));
-

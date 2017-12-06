@@ -53,7 +53,7 @@ fn commit_parse_line() {
     let line = parse_line("- foo bar");
     assert_eq!(None, line.scope);
     assert_eq!(None, line.category);
-    assert_eq!(Some(String::from("foo bar")), line.text);
+    assert_eq!(Some(String::from(" foo bar")), line.text);
 
     let line = parse_line("foo bar");
     assert_eq!(None, line.scope);
@@ -103,12 +103,11 @@ fn prepare_report() {
     use super::*;
     let commits = vec![fake_commit()];
     let config = config::from(None).unwrap();
-    let report = report::generate(&commits, &config);
+    let report = report::generate(&config, &commits);
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
-    println!("{}", report::render(&report, &config));
+    output::render(&config, &report);
     assert_eq!(report.commits.len(), 1);
     assert_eq!(report.scopes.len(), 2);
-    assert!(!report.title.is_empty());
     assert_eq!(report.scopes[0].categories[0].title, "Features");
     assert_eq!(report.scopes[0].categories[1].title, "Notes");
     assert_eq!(report.scopes[1].categories[0].title, "Breaking Changes");
