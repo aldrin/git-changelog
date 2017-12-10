@@ -2,7 +2,6 @@ language: rust
 
 rust:
   - stable
-  - nightly
 
 cache: cargo
 
@@ -11,13 +10,11 @@ script:
 
 before_deploy:
   - cargo build --release
+  - tar cfz target/release/git-changelog-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz target/release/git-changelog 
 
 os:
+  - osx
   - linux
-
-matrix:
-  allow_failures:
-    - rust: nightly
 
 deploy:
 
@@ -26,7 +23,7 @@ deploy:
   api_key:
     secure: ju4NVDw2Pdi6sOyB8CegIJOwsnZIdiRwGUmxMpna2jWuoiDT9tZyhN16Kht0yjTrKc2xwb/35xdEGqOAXyXrnU/SIF01WpYkjS6IR7Lgswpq6PRQiT0PjdMyotwdc/T8Yjktp29KyEJ4QjsvK37LV/pAq6YEu8O1haap0SuvMw0pJgrRyV32m8SpXCBDfLD4f0OJZUpY6CgfiZuJrV8UIf4uPnKWw2AgkYfLcFBPC8B/pUxfjuOcHuoojxDRB1AaZ0gMnkHSKRmtlJXdFscqp424bnoPczWyNQ4FTdTIQ6rVLUrcmGP83jp8kNW6taDsuuWU9QWysgehIXOY4eDrUNGDFwcBntjvcazYy9r82W67NYcqeUcYtYj1wu9XCWY2gS0h3qL0xFIZ3VJOUFb6a/85UOyji6dpLl4iFmm+ia4g3RVbtwO7Tgv6Ir9PCEHfxJ6lNpzgBV0SCkpV6od7J29xliYJhMZHEfYMt1W3PG4SEb/R8CQKkKt2EoPFNCP05mqECg+mUh02+x+Rg0yZ1SkRpIxQYf0EIibqN3Ik4SRgYLYXMRU3wRxLZlMiwCgBzINY2JcY3H6X3XAO67dHBXjYB2K5oy0KzywNjiXQPPCeiNiAd3tGiYksI6jde1+4zAWeCzcomRHvr2gH2aCHjjZSVeXffvhzbqXhUoS0cTo=
 
-  file: target/release/git-changelog
+  file: target/release/git-changelog-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz
 
   skip_cleanup: true
 
