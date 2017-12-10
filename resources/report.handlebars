@@ -5,7 +5,7 @@
 {{!-- Headlines  --}}
 #### Summary
 {{#each commits }}
-- {{#if number }}[#{{ number }}]{{/if}} {{{ summary ~}}}
+- {{{ summary }}} {{#if number }}(#{{ number }}){{/if ~}} 
 
 {{/each ~}}
 

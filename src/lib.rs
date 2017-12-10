@@ -13,13 +13,14 @@
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
-extern crate serde_json;
 #[macro_use]
 extern crate log;
 extern crate chrono;
 #[macro_use]
 extern crate nom;
 extern crate handlebars;
+extern crate regex;
+extern crate exitcode;
 
 pub mod git;
 pub mod tool;

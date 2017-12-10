@@ -14,6 +14,8 @@ use env_logger::LogBuilder;
 use log::{LogRecord, LogLevelFilter};
 
 fn main() {
+
+    // Initialize the CLI
     let cli = App::new(env!("CARGO_PKG_NAME"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
@@ -39,13 +41,19 @@ fn main() {
         )
         .get_matches();
 
+    // Initialize log verbosity
     init_logging(cli.occurrences_of("debug"));
 
-    let result = match changelog::config::from(cli.value_of("config")) {
+    // Identify the configuration file we're going to use
+    let filename = changelog::config::find_file(cli.value_of("config"));
+
+    // Initialize the configuration and run the tool
+    let result = match changelog::config::from(&filename) {
         Ok(c) => changelog::tool::run(&c, cli.values_of_lossy("revision-range")),
         _ => -1,
     };
 
+    // Done
     exit(result);
 }
 

@@ -1,0 +1,13 @@
+# Copyright 2017 Aldrin J D'Souza.
+# Licensed under the MIT License <https://opensource.org/licenses/MIT>
+
+# The changelog configuration file for this project
+categories:
+  - {keyword: "", title: "Features"}
+  - {keyword: "feature", title: "Features"}
+  - {keyword: "break", title: "Breaking Changes"}
+
+post_processors:
+  -
+    lookup: "#(?P<pr>\\d+)"
+    replace: "[#$pr](https://github.com/aldrin/git-changelog/pull/$pr)"

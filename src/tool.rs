@@ -6,25 +6,14 @@ use report;
 use output;
 use commit;
 use config;
-
-/// The exit code catalog
-mod exit {
-    /// All well
-    pub const OK: i32 = 0;
-
-    /// Not in a git repository
-    pub const NOT_GIT: i32 = 1;
-
-    /// No commits were found in range
-    pub const NO_COMMITS: i32 = 2;
-}
+use exitcode;
 
 /// The main tool entry-point
-pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> i32 {
+pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> exitcode::ExitCode {
 
     // First things first, are we even in a git repository?
     if git::in_git_repository().is_err() {
-        return exit::NOT_GIT;
+        return exitcode::NOINPUT;
     }
 
     // Decide the revision range we'll use for the report
@@ -63,7 +52,7 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
     // We need a list of commits to make progress
     if hashes.is_err() {
         error!("No commits in range. {:?}", hashes);
-        return exit::NO_COMMITS;
+        return exitcode::NOINPUT;
     }
 
     // A list of all commits
@@ -91,6 +80,9 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
         }
     }
 
+    // Order the commits by time
+    commits.sort_by(|a, b| a.time.cmp(&b.time));
+
     // Prepare the report
     let report = report::generate(config, &commits);
 
@@ -98,5 +90,5 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
     output::render(config, &report);
 
     // Done
-    exit::OK
+    exitcode::OK
 }

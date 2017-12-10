@@ -25,7 +25,7 @@ lot of time at release milestones.
 If you use a Mac with [Homebrew], you may prefer the following:
 
 ```bash
-> brew tap aldrin/tools
+> brew tap aldrin/tap
 > brew install git-changelog
 ```
 
@@ -74,7 +74,8 @@ When `git-changelog` is on the path, `git changelog` works just like `git log` a
 arguments. Concretely, it takes a [commit range] and looks for all commits in that range and uses
 the tags it finds in their messages to generate a report. Simple. :)
 
-```bash
+```
+> git changelog -h
 git-changelog (v0.2.0)
 Aldrin J D'Souza <mail@aldrin.co>
 A tool to automate project changelog generation.
