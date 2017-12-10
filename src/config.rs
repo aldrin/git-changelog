@@ -4,9 +4,12 @@
 use serde_yaml;
 use std::fs::File;
 use commit::Commit;
+use std::env::current_dir;
 use handlebars::Handlebars;
-use serde_json::to_string_pretty;
 use std::io::{Error, ErrorKind, Read, BufReader};
+
+/// The default configuration file name
+pub const FILE: &'static str = ".changelog.yml";
 
 /// A tag definition
 #[serde(default)]
@@ -16,6 +19,16 @@ pub struct Tag {
     pub keyword: String,
     /// The report heading
     pub title: String,
+}
+
+/// A post-processor definition
+#[serde(default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct PostProcessor {
+    /// The lookup pattern
+    pub lookup: String,
+    /// The replace pattern
+    pub replace: String,
 }
 
 /// The tool configuration structure (can be specified in a file)
@@ -32,19 +45,27 @@ pub struct Configuration {
     pub template: String,
     /// The date format
     pub date_format: String,
+    /// The line post-processors
+    pub post_processors: Vec<PostProcessor>,
 }
 
 /// Initialize configuration from the given file or use the default.
-pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
+pub fn from(filename: Option<String>) -> Result<Configuration, Error> {
 
     // Take the given filename
     let mut config: Configuration = match filename {
 
         // If none is given, initialize from the embedded default
-        None => serde_yaml::from_str(include_str!("../resources/config.yml")),
+        None => {
+            info!("Using default built-in configuration");
+            serde_yaml::from_str(include_str!("../resources/config.yml"))
+        }
 
         // If some file is given, read it and deserialize into the config structure
-        Some(file) => serde_yaml::from_reader(File::open(file)?),
+        Some(ref file) => {
+            info!("Using configuration from {}", file);
+            serde_yaml::from_reader(File::open(file)?)
+        }
     }.map_err(|e| {
         // Inform and get out
         error!("Invalid configuration file '{:?}', {}.", filename, e);
@@ -85,8 +106,22 @@ pub fn from(filename: Option<&str>) -> Result<Configuration, Error> {
         config.date_format = "%Y-%m-%d".to_string()
     }
 
+    // If no scopes are specified
+    if config.scopes.is_empty() {
+
+        // Add the default one
+        config.scopes.push(Tag::default());
+    }
+
+    // If no categories are specified
+    if config.categories.is_empty() {
+
+        // Add the default one
+        config.categories.push(Tag::default());
+    }
+
     // Print the log
-    info!("CONFIG: {}", to_string_pretty(&config).unwrap());
+    debug!("CONFIG: {:#?}", &config);
 
     // All good
     Ok(config)
@@ -133,4 +168,50 @@ pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
 
     // Boring.
     false
+}
+
+/// Identify the closest configuration file that should be used for this run
+pub fn find_file(given: Option<&str>) -> Option<String> {
+
+    // If we are given one
+    if given.is_some() {
+
+        // Use it
+        return given.map(str::to_string);
+    }
+
+    // Start at the current directory
+    if let Ok(mut cwd) = current_dir() {
+
+        // While we have hope
+        while cwd.exists() {
+
+            // Set the filename we're looking for
+            cwd.push(FILE);
+
+            // If we find it
+            if cwd.is_file() {
+
+                // return it
+                return Some(cwd.to_string_lossy().to_string());
+            }
+
+            // If not, remove the filename
+            cwd.pop();
+
+            // If we have room to go up
+            if cwd.parent().is_some() {
+
+                // Go up the path
+                cwd.pop();
+            } else {
+
+                // Get out
+                break;
+            }
+        }
+    }
+
+    // No file found
+    None
 }

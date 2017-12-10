@@ -7,7 +7,7 @@ use chrono::{DateTime, Local};
 use nom::{is_alphanumeric, IResult};
 
 /// A single commit
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Commit {
     /// The change SHA
     pub sha: String,
@@ -24,7 +24,7 @@ pub struct Commit {
 }
 
 /// A single line in the change message
-#[derive(Default, Serialize)]
+#[derive(Default, Serialize, Debug)]
 pub struct Line {
     /// The scope
     pub scope: Option<String>,

@@ -5,11 +5,10 @@
 use config;
 use commit::Commit;
 use config::Configuration;
-use std::collections::HashMap;
-use serde_json::to_string_pretty;
+use std::collections::{HashMap, HashSet};
 
 /// The complete report
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Report<'a> {
     /// Scoped changes in the report
     pub scopes: Vec<Scope>,
@@ -18,7 +17,7 @@ pub struct Report<'a> {
 }
 
 /// A group of changes in the same scope
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Scope {
     /// The title of the scope
     pub title: String,
@@ -27,7 +26,7 @@ pub struct Scope {
 }
 
 /// A group of changes with the same category
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Category {
     /// The title of the category
     pub title: String,
@@ -36,8 +35,10 @@ pub struct Category {
 }
 
 /// Change description
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Text {
+    /// A sequence number to inform ordering
+    pub sequence: u32,
     /// An opening headline
     pub opening: String,
     /// The remaining lines in the description
@@ -77,6 +78,9 @@ fn first_pass(config: &Configuration, commits: &[Commit]) -> RawReport {
     // A running raw report
     let mut raw_report = RawReport::new();
 
+    // A running counter
+    let mut sequence = 0;
+
     // Take each commit
     for commit in commits {
 
@@ -90,7 +94,7 @@ fn first_pass(config: &Configuration, commits: &[Commit]) -> RawReport {
             if line.category.is_some() {
 
                 // Close out the current item
-                record(&mut raw_report, config, current.clone());
+                record(&mut raw_report, config, current.clone(), &mut sequence);
 
                 // Start a new context
                 current.text = Vec::new();
@@ -103,11 +107,11 @@ fn first_pass(config: &Configuration, commits: &[Commit]) -> RawReport {
         }
 
         // Close the last open item
-        record(&mut raw_report, config, current);
+        record(&mut raw_report, config, current, &mut sequence);
     }
 
     // Log the raw_report for debugging
-    info!("RAW_REPORT: {}", to_string_pretty(&raw_report).unwrap());
+    debug!("RAW_REPORT: {:#?}", raw_report);
 
     raw_report
 }
@@ -118,6 +122,9 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
     // The report of all scopes
     let mut scopes = Vec::new();
 
+    // Track the scopes we've processed (required to avoid duplicates)
+    let mut processed_scopes = HashSet::new();
+
     // Go through each configured scope
     for scope in &config.scopes {
 
@@ -127,17 +134,46 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
             // The scoped categorized changes
             let mut categories = Vec::new();
 
+            // Track the categorizes we've processed (required to avoid duplicates)
+            let mut processed_categories = HashSet::new();
+
+            // If we've already seen this scope title
+            if processed_scopes.contains(&scope.title) {
+
+                // Skip it.
+                continue;
+            } else {
+
+                // Remember this scope title as processed
+                processed_scopes.insert(&scope.title);
+            }
+
             // Go through all configured scopes
             for category in &config.categories {
+
+                // If we've already processed this category title
+                if processed_categories.contains(&category.title) {
+
+                    // Skip it.
+                    continue;
+                } else {
+
+                    // Remember this category title as processed
+                    processed_categories.insert(&category.title);
+                }
 
                 // If there are changes of this category
                 if let Some(changes) = categorized.get(&category.title) {
 
+                    // The category title
+                    let title = category.title.clone();
+
+                    // Clone and sort to sequence text in time order
+                    let mut changes = changes.clone();
+                    changes.sort_by(|a, b| a.sequence.cmp(&b.sequence));
+
                     // Add them to the running list
-                    categories.push(Category {
-                        title: category.title.clone(),
-                        changes: changes.clone(),
-                    });
+                    categories.push(Category { title, changes });
                 }
             }
 
@@ -154,7 +190,7 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
 }
 
 /// Record the current state into the raw report
-fn record(raw: &mut RawReport, config: &Configuration, mut state: State) {
+fn record(raw: &mut RawReport, config: &Configuration, mut state: State, seq: &mut u32) {
 
     // Validate the scope with the configuration
     let scope = config::report_title(&config.scopes, &state.scope);
@@ -185,11 +221,18 @@ fn record(raw: &mut RawReport, config: &Configuration, mut state: State) {
         // Take the rest
         let rest = state.text;
 
+        // Increment the sequence
+        *seq = *seq + 1;
+
         // Record it in the raw report
         raw.entry(scope.unwrap())
             .or_insert_with(HashMap::new)
             .entry(category.unwrap())
             .or_insert_with(Vec::new)
-            .push(Text { opening, rest });
+            .push(Text {
+                sequence: *seq,
+                opening,
+                rest,
+            });
     }
 }

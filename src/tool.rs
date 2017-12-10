@@ -91,6 +91,9 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
         }
     }
 
+    // Order the commits by time
+    commits.sort_by(|a, b| a.time.cmp(&b.time));
+
     // Prepare the report
     let report = report::generate(config, &commits);
 
