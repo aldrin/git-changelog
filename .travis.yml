@@ -10,7 +10,7 @@ script:
 
 before_deploy:
   - cargo build --release
-  - tar cfz target/release/git-changelog-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz target/release/git-changelog 
+  - tar cfz target/release/git-changelog-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz -C target/release git-changelog 
 
 os:
   - osx

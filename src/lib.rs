@@ -20,6 +20,7 @@ extern crate chrono;
 extern crate nom;
 extern crate handlebars;
 extern crate regex;
+extern crate exitcode;
 
 pub mod git;
 pub mod tool;

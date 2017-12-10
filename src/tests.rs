@@ -4,7 +4,7 @@
 #[cfg(test)]
 #[test]
 fn default_configuration_is_valid() {
-    let config = super::config::from(None);
+    let config = super::config::from(&None);
     assert!(config.is_ok());
 }
 
@@ -102,7 +102,7 @@ fn parse_commit() {
 fn prepare_report() {
     use super::*;
     let commits = vec![fake_commit()];
-    let config = config::from(None).unwrap();
+    let config = config::from(&None).unwrap();
     let report = report::generate(&config, &commits);
     println!("{:#?}", &report);
     output::render(&config, &report);
@@ -124,6 +124,6 @@ fn postprocess() {
     let mut config = config::Configuration::default();
     config.post_processors = vec![jira];
 
-    let output = output::postprocess(&config, input);
+    let output = output::postprocess(&config, &input);
     assert_eq!(&output, "Fixed [JIRA-1234](https://jira.company.com/1234)");
 }

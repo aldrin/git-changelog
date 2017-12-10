@@ -48,7 +48,7 @@ fn main() {
     let filename = changelog::config::find_file(cli.value_of("config"));
 
     // Initialize the configuration and run the tool
-    let result = match changelog::config::from(filename) {
+    let result = match changelog::config::from(&filename) {
         Ok(c) => changelog::tool::run(&c, cli.values_of_lossy("revision-range")),
         _ => -1,
     };

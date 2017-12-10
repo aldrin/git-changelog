@@ -21,7 +21,7 @@ pub fn render(config: &Configuration, report: &Report) {
     // If we have line post processors,
     if !config.post_processors.is_empty() {
         // Post-process the output lines
-        out = postprocess(&config, out);
+        out = postprocess(config, &out);
     }
 
     // Print it out
@@ -29,7 +29,7 @@ pub fn render(config: &Configuration, report: &Report) {
 }
 
 /// Postprocess the output before printing it out
-pub fn postprocess(config: &Configuration, output: String) -> String {
+pub fn postprocess(config: &Configuration, output: &str) -> String {
 
     // Compile the post processor regular expressions
     let mut processors = Vec::new();

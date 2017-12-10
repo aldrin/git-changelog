@@ -12,6 +12,7 @@ use std::collections::{HashMap, HashSet};
 pub struct Report<'a> {
     /// Scoped changes in the report
     pub scopes: Vec<Scope>,
+
     /// All interesting commits
     pub commits: &'a [Commit],
 }
@@ -21,6 +22,7 @@ pub struct Report<'a> {
 pub struct Scope {
     /// The title of the scope
     pub title: String,
+
     /// A list of categorized changes
     pub categories: Vec<Category>,
 }
@@ -30,6 +32,7 @@ pub struct Scope {
 pub struct Category {
     /// The title of the category
     pub title: String,
+
     /// A list of change descriptions
     pub changes: Vec<Text>,
 }
@@ -39,8 +42,10 @@ pub struct Category {
 pub struct Text {
     /// A sequence number to inform ordering
     pub sequence: u32,
+
     /// An opening headline
     pub opening: String,
+
     /// The remaining lines in the description
     pub rest: Vec<String>,
 }
@@ -53,8 +58,10 @@ type RawReport = HashMap<String, HashMap<String, Vec<Text>>>;
 struct State {
     /// The current text
     text: Vec<String>,
+
     /// The current scope
     scope: Option<String>,
+
     /// The current category
     category: Option<String>,
 }
@@ -142,11 +149,10 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
 
                 // Skip it.
                 continue;
-            } else {
-
-                // Remember this scope title as processed
-                processed_scopes.insert(&scope.title);
             }
+
+            // Remember this scope title as processed
+            processed_scopes.insert(&scope.title);
 
             // Go through all configured scopes
             for category in &config.categories {
@@ -156,11 +162,10 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
 
                     // Skip it.
                     continue;
-                } else {
-
-                    // Remember this category title as processed
-                    processed_categories.insert(&category.title);
                 }
+
+                // Remember this category title as processed
+                processed_categories.insert(&category.title);
 
                 // If there are changes of this category
                 if let Some(changes) = categorized.get(&category.title) {
@@ -222,7 +227,7 @@ fn record(raw: &mut RawReport, config: &Configuration, mut state: State, seq: &m
         let rest = state.text;
 
         // Increment the sequence
-        *seq = *seq + 1;
+        *seq += 1;
 
         // Record it in the raw report
         raw.entry(scope.unwrap())

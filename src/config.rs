@@ -9,7 +9,7 @@ use handlebars::Handlebars;
 use std::io::{Error, ErrorKind, Read, BufReader};
 
 /// The default configuration file name
-pub const FILE: &'static str = ".changelog.yml";
+pub const FILE: &str = ".changelog.yml";
 
 /// A tag definition
 #[serde(default)]
@@ -17,6 +17,7 @@ pub const FILE: &'static str = ".changelog.yml";
 pub struct Tag {
     /// The identifying keyword
     pub keyword: String,
+
     /// The report heading
     pub title: String,
 }
@@ -27,6 +28,7 @@ pub struct Tag {
 pub struct PostProcessor {
     /// The lookup pattern
     pub lookup: String,
+
     /// The replace pattern
     pub replace: String,
 }
@@ -37,23 +39,28 @@ pub struct PostProcessor {
 pub struct Configuration {
     /// The change category configuration
     pub categories: Vec<Tag>,
+
     /// The change scope configuration
     pub scopes: Vec<Tag>,
+
     /// The report title
     pub title: String,
+
     /// The report template file
     pub template: String,
+
     /// The date format
     pub date_format: String,
+
     /// The line post-processors
     pub post_processors: Vec<PostProcessor>,
 }
 
 /// Initialize configuration from the given file or use the default.
-pub fn from(filename: Option<String>) -> Result<Configuration, Error> {
+pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
 
     // Take the given filename
-    let mut config: Configuration = match filename {
+    let mut config: Configuration = match *filename {
 
         // If none is given, initialize from the embedded default
         None => {
@@ -103,7 +110,7 @@ pub fn from(filename: Option<String>) -> Result<Configuration, Error> {
     if config.date_format.is_empty() {
 
         // Use a sensible default
-        config.date_format = "%Y-%m-%d".to_string()
+        config.date_format = "%Y-%m-%d %H:%M".to_string()
     }
 
     // If no scopes are specified
@@ -129,12 +136,22 @@ pub fn from(filename: Option<String>) -> Result<Configuration, Error> {
 
 /// Get the report title for a given tag
 pub fn report_title(tags: &[Tag], given: &Option<String>) -> Option<String> {
-    let given = given.clone().unwrap_or_default();
+
+    // Get the tag keyword (or blank, if none exists)
+    let keyword = given.clone().unwrap_or_default();
+
+    // Look for all known tags
     for tag in tags {
-        if tag.keyword == given {
+
+        // If the keywords match
+        if tag.keyword == keyword {
+
+            // Return the title
             return Some(tag.title.clone());
         }
     }
+
+    // Nothing found
     None
 }
 
