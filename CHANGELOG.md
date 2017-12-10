@@ -1,3 +1,46 @@
+## 0.2.0 (2017-12-10)
+
+#### Summary
+
+- Simplify configuration and group by tag titles ([#2](https://github.com/aldrin/git-changelog/pull/2))
+- Improve configuration file lookup and support post-processors ([#3](https://github.com/aldrin/git-changelog/pull/3))
+
+##### Features
+
+- Simplify configuration by omitting tags, defaults, etc. All we
+    need now are simple keyword->title mapping and keywords without
+    titles are skipped from the report. The aggregation is now done
+    on title (instead of tag keyword) which allows us to group
+    multiple tags into one report section. For example, with tags
+    `break => Breaking Change` and `braek => Breaking Change` we
+    can accommodate simple typos.
+  
+
+- The tool now automatically uses a configuration file
+    `.changelog.yml` in the current directory. If a file with that
+    name doesn't exist in the current directory, it looks up the
+    directory tree in the parent directories as long as it reaches
+    the root. This simplifies project specific configuration by
+    checking in a `.changelog.yml` in the repo root.
+  
+
+- The configuration can now specifiy post-processors
+    that look for specific markers like (e.g. `JIRA-12345`) and
+    replaces them with suitable replacements. This makes adding
+    links like [JIRA-1234](http://jira.company.com/view/JIRA-1234)
+    easy. In general, a post-processor is a `(lookup,replacement)`
+    tuple where a `lookup` is a regex with named capture groups
+    like `JIRA-(?P<ticket>\\d+)`) and
+    [replacement](https://doc.rust-lang.org/regex/regex/index.html#example-replacement-with-named-capture-groups)
+    is a simple string that refers to the named capture groups like
+    `[JIRA-$ticket](http://jira.company.com/view/JIRA-$ticket)`
+
+
+##### Breaking Changes
+
+- Configuration format has changed and old configuration
+    files will need some tweaks.
+
 ## 0.1.0 (2017-11-24)
 
 ### Summary

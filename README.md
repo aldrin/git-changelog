@@ -1,4 +1,6 @@
 [![Build Status]](https://travis-ci.org/aldrin/git-changelog)
+[![Crates.io](https://img.shields.io/crates/v/git-changelog.svg)](https://crates.io/crates/git-changelog)
+[![GitHub release](https://img.shields.io/github/release/aldrin/git-changelog.svg)](https://github.com/aldrin/git-changelog/releases)
 
 `git-changelog` is a tool to automate repository [changelog] generation.
 
@@ -28,6 +30,9 @@ If you use a Mac with [Homebrew], you may prefer the following:
 > brew tap aldrin/tap
 > brew install git-changelog
 ```
+
+Both options build the executable from sources - if you're looking for just the executables, they're
+attached to the [releases].
 
 ## Usage
 
@@ -74,37 +79,25 @@ When `git-changelog` is on the path, `git changelog` works just like `git log` a
 arguments. Concretely, it takes a [commit range] and looks for all commits in that range and uses
 the tags it finds in their messages to generate a report. Simple. :)
 
-```
-> git changelog -h
-git-changelog (v0.2.0)
-Aldrin J D'Souza <mail@aldrin.co>
-A tool to automate project changelog generation.
+The default revision range picks all commits made since the *last* tag. For example, to generate the
+changelog for `v0.2.0` of the tool, I used the following:
 
-USAGE:
-    git-changelog [FLAGS] [OPTIONS] [revision-range]...
-
-FLAGS:
-    -d, --debug      Prints debug logs
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
-    -c, --config <FILE>    Configuration file
-
-ARGS:
-    <revision-range>...    The revision range, defaults to HEAD...<last-tag>
+```bash
+> git changelog
 ```
 
-The default revision range picks all commits made since the *last* tag.
+The command picks all commits since [v0.1.1] (the current *last* tag) and generates a change report
+that I pasted verbatim to the [CHANGELOG.md].
 
 ## Customization
 
-*Tags*: You can specify a configuration file to define the tags and scopes you want to use for your
-project.  See the [default configuration file](resources/config.yml) for a starting example.
+Each project is different and you may want to customize the tags and output to suit your
+requirements. You can do that by adding a [.changelog.yml] file to your repository root. See the
+[default configuration file](resources/config.yml) for a starting example.
 
-*Template*: You can specify a [Handlebars] template to control the rendered report format. The
-[default template](resources/report.handlebars) generates a Markdown document that renders well on
-Github.
+If you like to tweak the output, you can specify a [Handlebars] template to control the rendered
+report format (using `template` key in your .changelog.yml). The [default
+template](resources/report.handlebars) generates a Markdown document that renders well on Github.
 
 [normally]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
@@ -112,3 +105,7 @@ Github.
 [commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
 [Homebrew]: https://brew.sh/
+[CHANGELOG.md]: CHANGELOG.md
+[v0.1.1]: https://github.com/aldrin/git-changelog/tree/v0.1.1
+[.changelog.yml]: .changelog.yml
+[releases]:https://github.com/aldrin/git-changelog/releases
