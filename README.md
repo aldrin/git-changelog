@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/aldrin/git-changelog.svg?branch=master)](https://travis-ci.org/aldrin/git-changelog)
+[![Build status](https://ci.appveyor.com/api/projects/status/ixcfop3nhjmx3s5v/branch/master?svg=true)](https://ci.appveyor.com/project/aldrin/git-changelog/branch/master)
 [![Crates.io](https://img.shields.io/crates/v/git-changelog.svg)](https://crates.io/crates/git-changelog)
 [![GitHub release](https://img.shields.io/github/release/aldrin/git-changelog.svg)](https://github.com/aldrin/git-changelog/releases)
 [![codecov](https://codecov.io/gh/aldrin/git-changelog/branch/master/graph/badge.svg)](https://codecov.io/gh/aldrin/git-changelog)
