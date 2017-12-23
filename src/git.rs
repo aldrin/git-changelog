@@ -44,7 +44,7 @@ fn last_tags(n: i32) -> Result<Vec<String>, Error> {
             "for-each-ref",
             &format!("--count={}", n),
             "--sort=-taggerdate",
-            "--format=%(refname:lstrip=2)",
+            "--format=%(refname:short)",
             "refs/tags/*",
         ],
     ).map(|o| read_lines(&o))
