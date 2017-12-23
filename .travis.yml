@@ -4,7 +4,7 @@ rust:
   - stable
 #  - nightly
 
-# All these are required for kcov
+# All these are required for building kcov
 addons:
   apt:
     packages:
@@ -22,17 +22,18 @@ os:
 #  - osx
   - linux
 
-# matrix:
-#   allow_failures:
-#     - rust: nightly
+matrix:
+  allow_failures:
+    - rust: nightly
 
-cache: cargo
+cache:
+  cargo: true
+  directories:
+    - $HOME/bin
 
 script:
   - cargo test -- --nocapture
-
-after_script:
-  - if [ $TRAVIS_OS_NAME = linux ]; then ./coverage.sh; fi
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./coverage.sh; fi
   
 before_deploy:
   - cargo build --release
