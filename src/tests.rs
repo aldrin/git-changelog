@@ -4,16 +4,12 @@
 #[cfg(test)]
 #[test]
 fn default_configuration_is_valid() {
-    let config = super::config::from(&None);
-    assert!(config.is_ok());
+    assert!(super::config::from(&None).is_ok());
 }
 
 #[test]
 fn git_last_tag() {
-    match super::git::last_tag().ok() {
-        Some(_) => (),
-        _ => assert!(false, "unexpected error"),
-    };
+    assert!(super::git::last_tag().is_ok());
 }
 
 #[test]

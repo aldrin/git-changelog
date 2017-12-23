@@ -1,6 +1,7 @@
-[![Build Status]](https://travis-ci.org/aldrin/git-changelog)
+[![Build Status](https://travis-ci.org/aldrin/git-changelog.svg?branch=master)](https://travis-ci.org/aldrin/git-changelog)
 [![Crates.io](https://img.shields.io/crates/v/git-changelog.svg)](https://crates.io/crates/git-changelog)
 [![GitHub release](https://img.shields.io/github/release/aldrin/git-changelog.svg)](https://github.com/aldrin/git-changelog/releases)
+[![Coverage Status](https://coveralls.io/repos/github/aldrin/git-changelog/badge.svg?branch=master)](https://coveralls.io/github/aldrin/git-changelog?branch=master)
 
 `git-changelog` is a tool to automate repository [changelog] generation.
 
@@ -101,7 +102,6 @@ template](resources/report.handlebars) generates a Markdown document that render
 
 [normally]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
-[Build Status]: https://travis-ci.org/aldrin/git-changelog.svg?branch=master
 [commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
 [Homebrew]: https://brew.sh/

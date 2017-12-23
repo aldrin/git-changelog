@@ -158,7 +158,7 @@ named!(category_scope_change<&str, Line>,
                (Line{
                    scope: Some(scope),
                    category: Some(category),
-                   text: Some(text),
+                   text: Some(text)
                 })));
 
 /// A line that has just a category and scope, but no text
@@ -170,7 +170,7 @@ named!(category_scope<&str, Line>,
                (Line{
                    scope: Some(scope),
                    category: Some(category),
-                   text: None,
+                   text: None
                })));
 
 /// A line that has just a category
@@ -181,7 +181,7 @@ named!(just_category<&str, Line>,
                (Line{
                    scope: None,
                    category: Some(category),
-                   text: None,
+                   text: None
                })));
 
 /// A line that has a category and a change, but no scope.
@@ -192,7 +192,7 @@ named!(category_change<&str, Line>,
                (Line{
                    scope: None,
                    category: Some(category),
-                   text: Some(text),
+                   text: Some(text)
                })));
 
 /// A line that has just a simple change (no tags).
@@ -202,7 +202,7 @@ named!(just_change<&str, Line>,
                  (Line{
                      scope: None,
                      category: None,
-                     text: Some(text),
+                     text: Some(text)
                  })));
 
 /// Consume whatever is left and return a String
