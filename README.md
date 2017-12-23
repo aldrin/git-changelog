@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/aldrin/git-changelog.svg?branch=master)](https://travis-ci.org/aldrin/git-changelog)
 [![Crates.io](https://img.shields.io/crates/v/git-changelog.svg)](https://crates.io/crates/git-changelog)
 [![GitHub release](https://img.shields.io/github/release/aldrin/git-changelog.svg)](https://github.com/aldrin/git-changelog/releases)
-[![Coverage Status](https://coveralls.io/repos/github/aldrin/git-changelog/badge.svg?branch=master)](https://coveralls.io/github/aldrin/git-changelog?branch=master)
+[![codecov](https://codecov.io/gh/aldrin/git-changelog/branch/master/graph/badge.svg)](https://codecov.io/gh/aldrin/git-changelog)
 
 `git-changelog` is a tool to automate repository [changelog] generation.
 
