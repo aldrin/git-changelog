@@ -1,0 +1,44 @@
+This file contains the developer GPG public keys. If you care for commit signature verification (for
+fun mostly :smile:), you should import these to your key ring. You can do that using:
+
+```sh
+> gpg --import KEYS.md
+```
+
+Here are the keys
+
+##### Aldrin
+
+```
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQENBFo/L20BCADEgr+q6scN8XSuevi3WtYeeVfLDzXWRQG/TIh30a4kB3HVwNdz
+oDw2LEW+Bu8JQvpCdiBsrucQusqmXD5moY0HG+1r+Y8xHYF351Ke1cOFkxBMsDrj
+CqlZ25u6WZXKfZnQkWHl27e8pUm7UfxA8PT2645LW8/r3o25xr7Jxb0ZWj7U04kv
+ndujOcbeC1LCSSmfHixRTy2yRKIeqy/bNCxAc//FDFz8lUYx6+J+EQW6p81uyaBG
+3bJSNDMyX/ytMyvTi+WhZ2C+yaCuDOKrvsVyyjEdmMc9Vh/8m1r0IMvVSiuugw7Y
+wdLR9mHpRmIGrq5mNQJxyMssBEmiRzmV5yLfABEBAAG0MkFsZHJpbiBKIEQnU291
+emEgPGFsZHJpbkB1c2Vycy5ub3JlcGx5LmdpdGh1Yi5jb20+iQFUBBMBCAA+FiEE
+p2hXxMpjEH9Zo8OobQkjL6CEXv8FAlo/L20CGwMFCQPCZwAFCwkIBwIGFQgJCgsC
+BBYCAwECHgECF4AACgkQbQkjL6CEXv/hdwf+IliO3TGfZlY49mylsZYacXsajg/Z
+s9L4Nm09baKDR/AqNplh74G1PD7r3ei7HaZJWyyxsMn9VEKuZGtnyQa9FR62wBfF
+WapHCFBJZJSoyRIOys+0/yzgJZjr5P7Ek8AY0yk3ZvhqmOUHOLcq8ZZbwukgdUpj
+V4LLNEyWRMfW/J29XSsfcVBTq3ayrYhlyEEwvNMAx0fVc8wq/fGiWpVJkrbqdPFv
+ag8bt9l4iglhZ9FEsDFnW1qo16X/rFWn8I1eoPoOdqAZInt4s1uuwk4T/aZe6iEg
+CCWNS2PWE578IXcV6JufjWbuIfG1QfHY7JVW+R6OkLT2CRF6WldmfP7Nt7kBDQRa
+Py9tAQgA1UgVSqZYyyL/j179Q108WihV1UCPu4eeDEnUIMd6Zxpc8ML2ZB0qWc8N
+ES3C9DUx1RXMIbFmi380OfWegdkh907m15TkasdnfCKudWd6bHUhevH9XdBgJDoK
+fmjcWOcVTeMZL57+WmADMXLBFbVTe3DdHejRMub5J3kyteKW7UhcynhOU54ehcfh
+9hyE5uFLVKkw6imMciKxn4ImQ3m1xcs2SyKBlvxbfIdBbYdOjXEfGxHLy8yhRIdi
+ncbpupBIoF5/0ny9yF47uXHcH4EGVCzjwBeEhyznbXfALVgtliYU+NZgo3b3FP/D
+28SObBlpo7gPOwJeyRehCl3d1OOBdwARAQABiQE8BBgBCAAmFiEEp2hXxMpjEH9Z
+o8OobQkjL6CEXv8FAlo/L20CGwwFCQPCZwAACgkQbQkjL6CEXv8BNQf/eWXJoDpG
+JG2EJoH72vYN3K1CctkZbKwRcQEPoFYXG53a6B6nXsLEufR0vAU5k6otTErd485/
+CzqCQD99HmNJCl5an4cLToDX8iRKYm9O8r1dk0yhN9iFnzO7XNuO3NJaHdjiD5LP
+FYIwVBCmbsZMIbt79GYR/8zs/Lgw7jbskR/oZ0ASKvmA6izBS+I1B5c0ut+QCK1S
+Hkw/cvp6XvIuj0G73xiaRA2Ag7YUSaR4cbBFlPg5C/esOe4XssOb986hjgpfIyss
+qK3o9Oezj6IrlPKO6X/1dfVr5G5r3s2E6Wo3PwwhbyNOzvm9gQDAE3cNUR7OhQCO
+WAABJvIefinHvQ==
+=WW9W
+-----END PGP PUBLIC KEY BLOCK-----
+```
