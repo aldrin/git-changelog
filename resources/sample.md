@@ -1,6 +1,6 @@
 #### Summary
 
-- [#4] Demonstrate tagging conventions for commit messages
+- Demonstrate tagging conventions for commit messages (#4)
 
 
 ##### Features

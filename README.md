@@ -33,8 +33,8 @@ If you use a Mac with [Homebrew], you may prefer the following:
 > brew install git-changelog
 ```
 
-Both options build the executable from sources - if you're looking for just the executables, they're
-attached to the [releases].
+Both options build the executable from sources.
+If you're looking for just the executables, they're attached to the [releases].
 
 ## Usage
 
