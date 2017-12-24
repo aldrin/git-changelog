@@ -51,3 +51,7 @@ deploy:
     overwrite: true
     repo: aldrin/git-changelog
     condition: $TRAVIS_RUST_VERSION = stable
+
+# Publish to Crates.io    
+after_deploy:
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then cargo publish; fi 
