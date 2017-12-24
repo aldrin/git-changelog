@@ -1,0 +1,38 @@
+os: Visual Studio 2015
+
+version: build-{build}
+
+skip_branch_with_pr: true  
+  
+install:
+  - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init -yv
+  - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+  - rustc -vV
+  - cargo -vV
+
+build_script:
+  - cargo build
+
+test_script:
+  - cargo test -- --nocapture
+
+after_test:  
+  - cargo build --release
+  - 7z a git-changelog.zip target/release/git-changelog.exe 
+
+artifacts:
+  - path: git-changelog.zip
+
+deploy:
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: 'release'
+  provider: GitHub
+  auth_token:
+    secure: zEUAhDPdOEdm8hzOpaT0KXDA2OCfdcYwmp4U3A57UyiJIljlqNeZY2NVClOXeecz
+  artifact: git-changelog.zip
+  draft: true
+  force_update: true
+  on:
+    branch: master           
+    appveyor_repo_tag: true  
