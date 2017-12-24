@@ -54,4 +54,4 @@ deploy:
 
 # Publish to Crates.io    
 after_deploy:
-  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then cargo publish; fi 
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then cargo login $CRATES; cargo publish; fi 
