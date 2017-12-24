@@ -1,3 +1,13 @@
+## 0.2.1 (2017-12-23)
+
+#### Summary
+
+- Release Windows Binaries ([#7](https://github.com/aldrin/git-changelog/pull/7))
+
+##### Features
+
+- Windows binaries are now available with releases.
+
 ## 0.2.0 (2017-12-10)
 
 #### Summary
