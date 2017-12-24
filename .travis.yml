@@ -2,7 +2,7 @@ language: rust
 
 rust:
   - stable
-#  - nightly
+  - nightly
 
 # All these are required for building kcov
 addons:
@@ -19,8 +19,8 @@ addons:
       libcurl4-openssl-dev
 
 os:
-#  - osx
   - linux
+  - osx
 
 matrix:
   allow_failures:

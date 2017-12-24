@@ -11,7 +11,6 @@ install:
   - rustc -vV
   - cargo -vV
 
-  
 build_script:
   - cargo build
 
@@ -37,4 +36,3 @@ deploy:
   on:
     branch: master           
     appveyor_repo_tag: true  
-    
