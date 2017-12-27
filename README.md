@@ -34,6 +34,7 @@ If you use a Mac with [Homebrew], you may prefer the following:
 ```
 
 Both options build the executable from sources.
+
 If you're looking for just the executables, they're attached to the [releases].
 
 ## Usage
