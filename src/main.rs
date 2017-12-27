@@ -1,28 +1,30 @@
 // Copyright 2017 Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-extern crate log;
-extern crate clap;
 extern crate changelog;
+extern crate clap;
 extern crate env_logger;
+extern crate log;
 
 use std::fs::File;
-use clap::{Arg, App};
+use clap::{App, Arg};
 use std::error::Error;
 use std::process::exit;
+use std::env::current_dir;
 use env_logger::LogBuilder;
-use log::{LogRecord, LogLevelFilter};
+use log::{LogLevelFilter, LogRecord};
 
 fn main() {
-
     // Initialize the CLI
     let cli = App::new(env!("CARGO_PKG_NAME"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .version(&format!("(v{})", env!("CARGO_PKG_VERSION"))[..])
-        .arg(Arg::with_name("revision-range").multiple(true).help(
-            "The revision range, defaults to HEAD...<last-tag>",
-        ))
+        .arg(
+            Arg::with_name("revision-range")
+                .multiple(true)
+                .help("The revision range, defaults to HEAD...<last-tag>"),
+        )
         .arg(
             Arg::with_name("config")
                 .short("c")
@@ -45,7 +47,9 @@ fn main() {
     init_logging(cli.occurrences_of("debug"));
 
     // Identify the configuration file we're going to use
-    let filename = changelog::config::find_file(cli.value_of("config"));
+    let filename = cli.value_of("config")
+        .map(str::to_string)
+        .or_else(|| changelog::config::find_file(current_dir().ok()));
 
     // Initialize the configuration and run the tool
     let result = match changelog::config::from(&filename) {

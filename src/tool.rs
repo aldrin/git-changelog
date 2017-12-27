@@ -10,7 +10,6 @@ use exitcode;
 
 /// The main tool entry-point
 pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> exitcode::ExitCode {
-
     // First things first, are we even in a git repository?
     if git::in_git_repository().is_err() {
         return exitcode::NOINPUT;
@@ -18,13 +17,11 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
 
     // Decide the revision range we'll use for the report
     let range = match given_range {
-
         // The user gave one, use it
         Some(vec) => vec,
 
         // None given
         None => {
-
             // Start from the last known tag
             let from = match git::last_tag() {
                 Ok(Some(tag)) => tag,
@@ -60,7 +57,6 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
 
     // Go through each sha in range
     for sha in hashes.unwrap() {
-
         // Get the commit message for the commit
         let message = git::get_commit_message(&sha);
 
@@ -87,7 +83,7 @@ pub fn run(config: &config::Configuration, given_range: Option<Vec<String>>) -> 
     let report = report::generate(config, &commits);
 
     // Show the report
-    output::render(config, &report);
+    println!("{}", output::render(config, &report));
 
     // Done
     exitcode::OK

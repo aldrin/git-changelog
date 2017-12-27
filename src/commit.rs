@@ -43,7 +43,6 @@ pub struct Line {
 
 /// Parse the commit message to a Commit object
 pub fn parse(lines: &[String], dt_format: &str) -> Commit {
-
     // Parsed commit
     Commit {
         // First line is the SHA
@@ -68,7 +67,6 @@ pub fn parse(lines: &[String], dt_format: &str) -> Commit {
 
 /// Parse the commit timestamp to local time
 pub fn parse_time(line: &str, format: &str) -> String {
-
     // Parse the git timestamp string
     DateTime::parse_from_rfc2822(line)
 
@@ -87,7 +85,6 @@ pub fn parse_time(line: &str, format: &str) -> String {
 
 /// Parse the commit subject removing the numbers tags.
 pub fn parse_subject(line: &str) -> String {
-
     // Find the first number opener on the commit subject
     let first_open = line.find("(#").unwrap_or_else(|| line.len());
 
@@ -97,7 +94,6 @@ pub fn parse_subject(line: &str) -> String {
 
 /// Parse the commit number
 pub fn parse_number(line: &str) -> Option<u32> {
-
     // The commit number is the last number on the subject
     let last_open = line.rfind("(#");
 
@@ -106,11 +102,9 @@ pub fn parse_number(line: &str) -> Option<u32> {
 
     // If no number found on subject line
     if last_open.is_none() || last_close.is_none() {
-
         // The commit has no number
         None
     } else {
-
         // Extract the bounds of the last number
         let end = last_close.unwrap();
         let start = last_open.unwrap() + "(#".len();
@@ -125,10 +119,8 @@ pub fn parse_number(line: &str) -> Option<u32> {
 
 /// Parse an individual message line
 pub fn parse_line(line: &str) -> Line {
-
     // Parse the tags in the line
     match tagged_change(line) {
-
         // If parser succeeded, we have our line
         IResult::Done(_, l) => l,
 

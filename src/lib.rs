@@ -10,17 +10,17 @@
 //! *categories* and these organized changes can then be presented as pretty change-logs or release
 //! notes. Commits messages without tags are quietly ignored and developers are free to tag as
 //! little or as much as they want.
+extern crate chrono;
+extern crate exitcode;
+extern crate handlebars;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate nom;
+extern crate regex;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
-#[macro_use]
-extern crate log;
-extern crate chrono;
-#[macro_use]
-extern crate nom;
-extern crate handlebars;
-extern crate regex;
-extern crate exitcode;
 
 pub mod git;
 pub mod tool;
@@ -28,4 +28,3 @@ pub mod commit;
 pub mod config;
 pub mod report;
 pub mod output;
-mod tests;

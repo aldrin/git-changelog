@@ -33,7 +33,7 @@ cache:
 
 script:
   - cargo test -- --nocapture
-  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./coverage.sh; fi
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./.travis-coverage.sh; fi
   
 before_deploy:
   - cargo build --release

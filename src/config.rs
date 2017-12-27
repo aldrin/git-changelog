@@ -4,9 +4,9 @@
 use serde_yaml;
 use std::fs::File;
 use commit::Commit;
-use std::env::current_dir;
+use std::path::PathBuf;
 use handlebars::Handlebars;
-use std::io::{Error, ErrorKind, Read, BufReader};
+use std::io::{BufReader, Error, ErrorKind, Read};
 
 /// The default configuration file name
 pub const FILE: &str = ".changelog.yml";
@@ -58,14 +58,12 @@ pub struct Configuration {
 
 /// Initialize configuration from the given file or use the default.
 pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
-
     // Take the given filename
     let mut config: Configuration = match *filename {
-
         // If none is given, initialize from the embedded default
         None => {
             info!("Using default built-in configuration");
-            serde_yaml::from_str(include_str!("../resources/config.yml"))
+            serde_yaml::from_str(include_str!("../changelog.yml"))
         }
 
         // If some file is given, read it and deserialize into the config structure
@@ -81,9 +79,8 @@ pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
 
     // Read the template in the effective configuration
     let template = if config.template.is_empty() {
-
         // If empty, initialize from the embedded default
-        String::from(include_str!("../resources/report.handlebars"))
+        String::from(include_str!("../changelog.hbs"))
     } else {
         // Have a file name, read it fully
         let mut template = String::new();
@@ -108,21 +105,18 @@ pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
 
     // If no data_format is specified
     if config.date_format.is_empty() {
-
         // Use a sensible default
         config.date_format = "%Y-%m-%d %H:%M".to_string()
     }
 
     // If no scopes are specified
     if config.scopes.is_empty() {
-
         // Add the default one
         config.scopes.push(Tag::default());
     }
 
     // If no categories are specified
     if config.categories.is_empty() {
-
         // Add the default one
         config.categories.push(Tag::default());
     }
@@ -136,16 +130,13 @@ pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
 
 /// Get the report title for a given tag
 pub fn report_title(tags: &[Tag], given: &Option<String>) -> Option<String> {
-
     // Get the tag keyword (or blank, if none exists)
     let keyword = given.clone().unwrap_or_default();
 
     // Look for all known tags
     for tag in tags {
-
         // If the keywords match
         if tag.keyword == keyword {
-
             // Return the title
             return Some(tag.title.clone());
         }
@@ -157,10 +148,8 @@ pub fn report_title(tags: &[Tag], given: &Option<String>) -> Option<String> {
 
 /// A commit is interesting if it has at least one line with an interesting scopes and category.
 pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
-
     // Look at each line in the commit message
     for line in &commit.lines {
-
         // Ignore blank lines
         if line.text.is_none() {
             continue;
@@ -188,27 +177,16 @@ pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
 }
 
 /// Identify the closest configuration file that should be used for this run
-pub fn find_file(given: Option<&str>) -> Option<String> {
-
-    // If we are given one
-    if given.is_some() {
-
-        // Use it
-        return given.map(str::to_string);
-    }
-
+pub fn find_file(start_dir: Option<PathBuf>) -> Option<String> {
     // Start at the current directory
-    if let Ok(mut cwd) = current_dir() {
-
+    if let Some(mut cwd) = start_dir {
         // While we have hope
         while cwd.exists() {
-
             // Set the filename we're looking for
             cwd.push(FILE);
 
             // If we find it
             if cwd.is_file() {
-
                 // return it
                 return Some(cwd.to_string_lossy().to_string());
             }
@@ -218,11 +196,9 @@ pub fn find_file(given: Option<&str>) -> Option<String> {
 
             // If we have room to go up
             if cwd.parent().is_some() {
-
                 // Go up the path
                 cwd.pop();
             } else {
-
                 // Get out
                 break;
             }
