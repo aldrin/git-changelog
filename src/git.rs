@@ -18,36 +18,28 @@ pub fn last_tag() -> Result<Option<String>, Error> {
 
 /// Get the SHAs for all commits in the revision range
 pub fn commits_in_range(range: &[String]) -> Result<Vec<String>, Error> {
-    let mut log = vec!["log", "--format=format:%H"];
-    for r in range {
-        log.push(r)
-    }
-    git(&log).map(|o| read_lines(&o))
+    git(&["log", "--format=format:%H", &range.join("")]).map(|o| read_lines(&o))
 }
 
 /// Get the commit message for the given sha
 pub fn get_commit_message(sha: &str) -> Result<Vec<String>, Error> {
-    git(
-        &[
-            "log",
-            "--format=format:%H%n%an%n%aD%n%s%n%b",
-            "--max-count=1",
-            sha,
-        ],
-    ).map(|o| read_lines(&o))
+    git(&[
+        "log",
+        "--format=format:%H%n%an%n%aD%n%s%n%b",
+        "--max-count=1",
+        sha,
+    ]).map(|o| read_lines(&o))
 }
 
 /// Get the last n tags
 fn last_tags(n: i32) -> Result<Vec<String>, Error> {
-    git(
-        &[
-            "for-each-ref",
-            &format!("--count={}", n),
-            "--sort=-taggerdate",
-            "--format=%(refname:short)",
-            "refs/tags/*",
-        ],
-    ).map(|o| read_lines(&o))
+    git(&[
+        "for-each-ref",
+        &format!("--count={}", n),
+        "--sort=-taggerdate",
+        "--format=%(refname:short)",
+        "refs/tags/*",
+    ]).map(|o| read_lines(&o))
 }
 
 /// Invoke a git command with the given arguments.

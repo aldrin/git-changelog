@@ -6,8 +6,8 @@
 
 `git-changelog` is a tool to automate repository [changelog] generation.
 
-A commit [like this](resources/sample-commit.message) generates an output [like
-this](resources/sample.md).
+A commit [like this](tests/sample-commit.message) generates an output [like
+this](tests/sample.md).
 
 ## Motivation
 
@@ -95,11 +95,11 @@ that I pasted verbatim to the [CHANGELOG.md].
 
 Each project is different and you may want to customize the tags and output to suit your
 requirements. You can do that by adding a [.changelog.yml] file to your repository root. See the
-[default configuration file](resources/config.yml) for a starting example.
+[default configuration file](config.yml) for a starting example.
 
 If you like to tweak the output, you can specify a [Handlebars] template to control the rendered
-report format (using `template` key in your .changelog.yml). The [default
-template](resources/report.handlebars) generates a Markdown document that renders well on Github.
+report format (using `template` key in your .changelog.yml). The [default template](changelog.hbs)
+generates a Markdown document that renders well on Github.
 
 [normally]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
