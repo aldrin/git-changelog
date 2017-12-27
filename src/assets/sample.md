@@ -1,6 +1,6 @@
 #### Summary
 
-- Demonstrate tagging conventions for commit messages (#5)
+- Demonstrate tagging conventions for commit messages (#6)
 
 
 ##### Features
@@ -64,3 +64,4 @@
   
   All text that follows a tagged line is implicitly categorized under the
   currently active tags.
+  

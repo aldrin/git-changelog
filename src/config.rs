@@ -2,112 +2,19 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 use serde_yaml;
-use std::fs::File;
-use commit::Commit;
-use std::path::PathBuf;
-use handlebars::Handlebars;
-use std::io::{BufReader, Error, ErrorKind, Read};
-
-/// The default configuration file name
-pub const FILE: &str = ".changelog.yml";
-
-/// A tag definition
-#[serde(default)]
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Tag {
-    /// The identifying keyword
-    pub keyword: String,
-
-    /// The report heading
-    pub title: String,
-}
-
-/// A post-processor definition
-#[serde(default)]
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct PostProcessor {
-    /// The lookup pattern
-    pub lookup: String,
-
-    /// The replace pattern
-    pub replace: String,
-}
-
-/// The tool configuration structure (can be specified in a file)
-#[serde(default)]
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct Configuration {
-    /// The change category configuration
-    pub categories: Vec<Tag>,
-
-    /// The change scope configuration
-    pub scopes: Vec<Tag>,
-
-    /// The report title
-    pub title: String,
-
-    /// The report template file
-    pub template: String,
-
-    /// The date format
-    pub date_format: String,
-
-    /// The line post-processors
-    pub post_processors: Vec<PostProcessor>,
-}
+use super::{Commit, Configuration, Tag};
+use std::io::{Error, ErrorKind};
 
 /// Initialize configuration from the given file or use the default.
-pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
-    // Take the given filename
-    let mut config: Configuration = match *filename {
-        // If none is given, initialize from the embedded default
-        None => {
-            info!("Using default built-in configuration");
-            serde_yaml::from_str(include_str!("../changelog.yml"))
-        }
+pub fn from_yml(given: Option<String>) -> Result<Configuration, Error> {
+    // Take the given configuration YAML or load the embedded asset
+    let yml = given.unwrap_or_else(|| String::from(include_str!("assets/changelog.yml")));
 
-        // If some file is given, read it and deserialize into the config structure
-        Some(ref file) => {
-            info!("Using configuration from {}", file);
-            serde_yaml::from_reader(File::open(file)?)
-        }
-    }.map_err(|e| {
-        // Inform and get out
-        error!("Invalid configuration file '{:?}', {}.", filename, e);
+    // Deserialize from the YAML string and report errors, if any.
+    let mut config: Configuration = serde_yaml::from_str(&yml).map_err(|e| {
+        error!("Configuration file is invalid YAML: {}", e);
         Error::from(ErrorKind::InvalidInput)
     })?;
-
-    // Read the template in the effective configuration
-    let template = if config.template.is_empty() {
-        // If empty, initialize from the embedded default
-        String::from(include_str!("../changelog.hbs"))
-    } else {
-        // Have a file name, read it fully
-        let mut template = String::new();
-        let file = File::open(config.template)?;
-        BufReader::new(file).read_to_string(&mut template)?;
-
-        // And use as the template
-        template
-    };
-
-    // Render the template and check for syntax issues early
-    Handlebars::new()
-        .register_template_string("t", &template)
-        .map_err(|e| {
-            // Syntax error, inform and get out
-            error!("Invalid handlebar template: '{}'", e);
-            Error::from(ErrorKind::InvalidInput)
-        })?;
-
-    // Overwrite the template we'll use.
-    config.template = template;
-
-    // If no data_format is specified
-    if config.date_format.is_empty() {
-        // Use a sensible default
-        config.date_format = "%Y-%m-%d %H:%M".to_string()
-    }
 
     // If no scopes are specified
     if config.scopes.is_empty() {
@@ -121,8 +28,14 @@ pub fn from(filename: &Option<String>) -> Result<Configuration, Error> {
         config.categories.push(Tag::default());
     }
 
+    // If no date_format is specified
+    if config.date_format.is_empty() {
+        // Use a sensible default
+        config.date_format = "%Y-%m-%d %H:%M".to_string()
+    }
+
     // Print the log
-    debug!("CONFIG: {:#?}", &config);
+    debug!("{:#?}", &config);
 
     // All good
     Ok(config)
@@ -148,6 +61,8 @@ pub fn report_title(tags: &[Tag], given: &Option<String>) -> Option<String> {
 
 /// A commit is interesting if it has at least one line with an interesting scopes and category.
 pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
+    debug!("Considering {:#?}", commit);
+
     // Look at each line in the commit message
     for line in &commit.lines {
         // Ignore blank lines
@@ -176,35 +91,29 @@ pub fn is_interesting(config: &Configuration, commit: &Commit) -> bool {
     false
 }
 
-/// Identify the closest configuration file that should be used for this run
-pub fn find_file(start_dir: Option<PathBuf>) -> Option<String> {
-    // Start at the current directory
-    if let Some(mut cwd) = start_dir {
-        // While we have hope
-        while cwd.exists() {
-            // Set the filename we're looking for
-            cwd.push(FILE);
+#[cfg(test)]
+mod tests {
 
-            // If we find it
-            if cwd.is_file() {
-                // return it
-                return Some(cwd.to_string_lossy().to_string());
-            }
+    #[test]
+    fn from_yml() {
+        use super::from_yml;
+        let none = None;
+        let blank = Some(String::new());
+        let project = Some(String::from(include_str!("../.changelog.yml")));
+        let no_category = Some(String::from(r#"scopes: [{keyword:"a", title: "A"}]"#));
+        let no_scope = Some(String::from(r#"categories: [{keyword:"a", title: "A"}]"#));
 
-            // If not, remove the filename
-            cwd.pop();
-
-            // If we have room to go up
-            if cwd.parent().is_some() {
-                // Go up the path
-                cwd.pop();
-            } else {
-                // Get out
-                break;
-            }
-        }
+        assert!(from_yml(none).is_ok());
+        assert!(from_yml(blank).is_err());
+        assert!(from_yml(project).is_ok());
+        assert!(from_yml(no_scope).is_ok());
+        assert!(from_yml(no_category).is_ok());
     }
 
-    // No file found
-    None
+    #[test]
+    fn is_interesting() {
+        let blank = super::Commit::default();
+        let config = super::from_yml(None).unwrap();
+        assert!(!super::is_interesting(&config, &blank));
+    }
 }

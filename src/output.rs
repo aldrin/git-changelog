@@ -2,35 +2,30 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 // Output concerns
-
-use regex::Regex;
-use report::Report;
-use config::Configuration;
 use handlebars::Handlebars;
+use regex::Regex;
+use super::{ChangeLog, PostProcessor};
+use std::io::{Error, ErrorKind};
 
-/// Render the given report with the given configuration
-pub fn render(config: &Configuration, report: &Report) -> String {
-    // Render the report using Handlebars
-    let mut out = Handlebars::new()
-        .template_render(&config.template, report)
-        .unwrap()
-        .trim()
-        .to_string();
+pub fn from_hbs(given: Option<String>) -> Result<Handlebars, Error> {
+    let mut hbs = Handlebars::new();
+    let md = given.unwrap_or_else(|| String::from(include_str!("assets/changelog.hbs")));
+    hbs.register_template_string("default", md).map_err(|e| {
+        error!("Invalid handlebar template: '{}'", e);
+        Error::from(ErrorKind::InvalidInput)
+    })?;
+    Ok(hbs)
+}
 
-    // If we have line post processors,
-    if !config.post_processors.is_empty() {
-        // Post-process the output lines
-        out = postprocess(config, &out);
-    }
-
-    out
+pub fn render(log: &ChangeLog, hbs: &Handlebars) -> String {
+    hbs.render("default", log).unwrap().trim().to_string()
 }
 
 /// Postprocess the output before printing it out
-pub fn postprocess(config: &Configuration, output: &str) -> String {
+pub fn postprocess(post_processors: &[PostProcessor], output: &str) -> String {
     // Compile the post processor regular expressions
     let mut processors = Vec::new();
-    for processor in &config.post_processors {
+    for processor in post_processors {
         // Processor the lookup regular expression
         if let Ok(lookup) = Regex::new(&processor.lookup) {
             // Inform
@@ -64,4 +59,31 @@ pub fn postprocess(config: &Configuration, output: &str) -> String {
 
     // Return what we ended with
     processed.join("\n")
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn from_hbs() {
+        use super::from_hbs;
+        assert!(from_hbs(None).is_ok());
+        assert!(from_hbs(Some(String::from("{{bad"))).is_err());
+    }
+
+    #[test]
+    fn postprocess() {
+        let input = String::from("Fixed JIRA-1234\nfoo");
+        let mut jira = super::PostProcessor::default();
+        jira.lookup = r"JIRA-(?P<t>\d+)".to_string();
+        jira.replace = r"[JIRA-$t](https://our.jira/$t)".to_string();
+        let out = super::postprocess(&vec![jira], &input);
+        assert_eq!(&out, "Fixed [JIRA-1234](https://our.jira/1234)\nfoo");
+
+        let mut bad = super::PostProcessor::default();
+        bad.lookup = r"JIRA-?(P<t\d+".to_string();
+        bad.replace = r"whatever".to_string();
+        let out = super::postprocess(&vec![bad], &input);
+        assert_eq!(&out, &input);
+    }
 }

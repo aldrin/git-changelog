@@ -2,6 +2,7 @@
 {{!-- Licensed under the MIT License <https://opensource.org/licenses/MIT> --}}
 
 {{!-- The default Markdown report format --}}
+{{#if commits}}
 {{!-- Headlines  --}}
 #### Summary
 {{#each commits }}
@@ -23,3 +24,4 @@
 {{/each}}
 {{/each}}
 {{/each}}
+{{/if}}

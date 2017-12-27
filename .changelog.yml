@@ -1,9 +1,10 @@
 # Copyright 2017 Aldrin J D'Souza.
 # Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-# The changelog configuration file for this project
+# This is the changelog configuration file for -this- project
+# If you're looking for the default out-of-the-box configuration
+# used by the tool, see `changelog.yml`.
 categories:
-  - {keyword: "", title: "Features"}
   - {keyword: "feature", title: "Features"}
   - {keyword: "break", title: "Breaking Changes"}
 
