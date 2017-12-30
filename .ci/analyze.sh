@@ -5,7 +5,7 @@
 set -ex
 
 # Install rustfmt and clippy
-which rustfmt || cargo install rustfmt-nightly
+which cargo-fmt || cargo install rustfmt-nightly
 which cargo-clippy || cargo install clippy
 
 # Check code style
