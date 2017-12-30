@@ -31,10 +31,13 @@ cache:
   directories:
     - $HOME/bin
 
+before_script:
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = nightly ]]; then ./.ci/analyze.sh; fi
+
 script:
   - cargo test -- --nocapture
-  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./.travis-coverage.sh; fi
-  
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./.ci/coverage.sh; fi
+ 
 before_deploy:
   - cargo build --release
   - tar cfz target/release/git-changelog-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz -C target/release git-changelog 
@@ -54,4 +57,4 @@ deploy:
 
 # Publish to Crates.io    
 after_deploy:
-  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then cargo login $CRATES; cargo publish; fi 
+  - if [[ $TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable ]]; then ./.ci/publish.sh; fi 

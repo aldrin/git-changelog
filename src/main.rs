@@ -2,69 +2,36 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 extern crate changelog;
+#[macro_use]
 extern crate clap;
 extern crate env_logger;
 extern crate log;
 
-use std::fs::File;
-use clap::{App, Arg};
-use std::error::Error;
-use std::process::exit;
+use clap::App;
+use std::env::args_os;
 use std::env::current_dir;
+use std::process::exit;
+use std::ffi::OsString;
 use env_logger::LogBuilder;
 use log::{LogLevelFilter, LogRecord};
 
+// The entry-point
 fn main() {
-    // Initialize the CLI
-    let cli = App::new(env!("CARGO_PKG_NAME"))
-        .author(env!("CARGO_PKG_AUTHORS"))
-        .about(env!("CARGO_PKG_DESCRIPTION"))
-        .version(&format!("(v{})", env!("CARGO_PKG_VERSION"))[..])
-        .arg(
-            Arg::with_name("revision-range")
-                .multiple(true)
-                .help("The revision range, defaults to HEAD...<last-tag>"),
-        )
-        .arg(
-            Arg::with_name("config")
-                .short("c")
-                .long("config")
-                .takes_value(true)
-                .value_name("FILE")
-                .validator(|s| valid_path(&s))
-                .help("Configuration file"),
-        )
-        .arg(
-            Arg::with_name("debug")
-                .short("d")
-                .long("debug")
-                .multiple(true)
-                .help("Prints debug logs"),
-        )
-        .get_matches();
-
-    // Initialize log verbosity
-    init_logging(cli.occurrences_of("debug"));
-
-    // Identify the configuration file we're going to use
-    let filename = cli.value_of("config")
-        .map(str::to_string)
-        .or_else(|| changelog::config::find_file(current_dir().ok()));
-
-    // Initialize the configuration and run the tool
-    let result = match changelog::config::from(&filename) {
-        Ok(c) => changelog::tool::run(&c, cli.values_of_lossy("revision-range")),
-        _ => -1,
-    };
-
-    // Done
-    exit(result);
+    run(args_os().collect());
 }
 
-/// Initialize error reporting.
-fn init_logging(verbosity: u64) {
-    // Pick a log level
-    let level = match verbosity {
+// The real entry-point
+fn run(args: Vec<OsString>) {
+    // Initialize the CLI
+    let yml = load_yaml!("assets/cli.yml");
+    let cli = App::from_yaml(yml)
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .version(env!("CARGO_PKG_VERSION"))
+        .about(env!("CARGO_PKG_DESCRIPTION"))
+        .get_matches_from(args);
+
+    // Initialize log verbosity
+    let level = match cli.occurrences_of("debug") {
         1 => LogLevelFilter::Info,
         2 => LogLevelFilter::Debug,
         n if n > 2 => LogLevelFilter::Trace,
@@ -73,19 +40,34 @@ fn init_logging(verbosity: u64) {
 
     // Pick the log format
     let format = |r: &LogRecord| format!("{}: {}", r.level(), r.args());
+
     // Build the logger
     let mut builder = LogBuilder::new();
-    builder.format(format).filter(None, level);
+    builder.format(format).filter(Some("changelog"), level);
     builder.init().unwrap();
+
+    // Initialize the tool from the cli arguments
+    let input = changelog::Input {
+        output_json: cli.is_present("json"),
+        revision_range: cli.values_of_lossy("RANGE"),
+        config_file: cli.value_of("config").map(str::to_string),
+        output_template_file: cli.value_of("template").map(str::to_string),
+    };
+
+    // Done
+    exit(match changelog::run(input, &current_dir().unwrap()) {
+        Err(exit) => exit,
+        Ok(output) => {
+            println!("{}", output);
+            0
+        }
+    });
 }
 
-/// Check if the given path is valid
-fn valid_path(path: &str) -> Result<(), String> {
-    File::open(path).map(|_| ()).map_err(|e| {
-        let mut reason = String::from("Invalid file: ");
-        reason.push_str(path);
-        reason.push_str(" Reason: ");
-        reason.push_str(e.description());
-        reason
-    })
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn just_run() {
+        super::run(vec![]);
+    }
 }

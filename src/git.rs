@@ -18,7 +18,11 @@ pub fn last_tag() -> Result<Option<String>, Error> {
 
 /// Get the SHAs for all commits in the revision range
 pub fn commits_in_range(range: &[String]) -> Result<Vec<String>, Error> {
-    git(&["log", "--format=format:%H", &range.join("")]).map(|o| read_lines(&o))
+    let mut log = vec!["log", "--format=format:%H"];
+    for r in range {
+        log.push(r)
+    }
+    git(&log).map(|o| read_lines(&o))
 }
 
 /// Get the commit message for the given sha
@@ -49,7 +53,8 @@ fn git(args: &[&str]) -> Result<Output, Error> {
     if output.status.success() {
         Ok(output)
     } else {
-        error!("{}", String::from_utf8_lossy(&output.stderr));
+        println!("{}", String::from_utf8_lossy(&output.stderr));
+        println!("{}", String::from_utf8_lossy(&output.stdout));
         Err(Error::from(ErrorKind::InvalidData))
     }
 }
@@ -60,4 +65,33 @@ fn read_lines<T: FromIterator<String>>(o: &Output) -> T {
         .lines()
         .map(String::from)
         .collect::<T>()
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn in_git_repository() {
+        assert!(super::in_git_repository().is_ok());
+    }
+
+    #[test]
+    fn last_tag() {
+        assert!(super::last_tag().is_ok());
+    }
+
+    #[test]
+    fn commits_in_range() {
+        use super::commits_in_range;
+        let range = vec![String::from("v0.1.1...v0.2.0")];
+        let commits = commits_in_range(&range);
+        assert!(commits.is_ok(), "{:?}", commits);
+        assert_eq!(commits.unwrap().len(), 2);
+    }
+
+    #[test]
+    fn get_commit_message() {
+        use super::get_commit_message;
+        assert!(get_commit_message("v0.1.1").is_ok());
+        assert!(get_commit_message("bad").is_err());
+    }
 }

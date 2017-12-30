@@ -1,0 +1,26 @@
+name: git-changelog
+args:
+    - config:
+        short: c
+        long: config
+        value_name: FILE
+        help: Sets a custom configuration file
+        takes_value: true
+    - template:
+        short: t
+        long: template
+        value_name: FILE
+        help: Sets a custom Handlebars template file
+        takes_value: true
+    - json:
+        short: j
+        long: json
+        help: Generate report as JSON
+    - debug:
+        short: d
+        long: debug
+        multiple: true
+        help: Enables debug logs
+    - RANGE:
+        help: Sets the revision range for commits (same as `git log`)
+        multiple: true

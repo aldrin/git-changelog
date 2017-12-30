@@ -1,8 +1,11 @@
 # Copyright 2017 Aldrin J D'Souza.
 # Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-# The default out-of-the-box configuration file for git-changelog.  This configuration can be
-# overridden using the `-c` or `--config` command line parameter.
+# The out of the box configuration for git-changelog.  This
+# file contains the configuration the tool runs with unless
+# you override it by: (1) passing a `-c` or `--config`
+# argument at the command line, or (2) adding a
+# `.changelog.yml` file in your git repository.
 
 ## Project Conventions
 
@@ -18,8 +21,8 @@
 # The item with an empty string keyword applies to lines
 # that have no explicit tags.
 
-# The order of tag definitions in the configuration controls
-# the order in which the tags
+# The sequence of tag definitions here controls the order in
+# which the tags will show up in the final report.
 categories:
   - {keyword: "security", title: "Security Updates"}
   - {keyword: "break", title: "Breaking Changes"}
@@ -39,3 +42,6 @@ scopes:
   - {keyword: "", title: ""}
   - {keyword: "api", title: "API"}
   - {keyword: "doc", title: "Documentation"}
+
+# The date format
+date_format: "%Y-%m-%d %H:%M"

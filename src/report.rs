@@ -3,55 +3,11 @@
 
 /// Presentation and Reporting
 use config;
-use commit::Commit;
-use config::Configuration;
+use super::*;
 use std::collections::{HashMap, HashSet};
 
-/// The complete report
-#[derive(Serialize, Debug)]
-pub struct Report<'a> {
-    /// Scoped changes in the report
-    pub scopes: Vec<Scope>,
-
-    /// All interesting commits
-    pub commits: &'a [Commit],
-}
-
-/// A group of changes in the same scope
-#[derive(Serialize, Debug)]
-pub struct Scope {
-    /// The title of the scope
-    pub title: String,
-
-    /// A list of categorized changes
-    pub categories: Vec<Category>,
-}
-
-/// A group of changes with the same category
-#[derive(Serialize, Debug)]
-pub struct Category {
-    /// The title of the category
-    pub title: String,
-
-    /// A list of change descriptions
-    pub changes: Vec<Text>,
-}
-
-/// Change description
-#[derive(Serialize, Clone, Debug)]
-pub struct Text {
-    /// A sequence number to inform ordering
-    pub sequence: u32,
-
-    /// An opening headline
-    pub opening: String,
-
-    /// The remaining lines in the description
-    pub rest: Vec<String>,
-}
-
 /// A temporary report structure with look-ups on scope and category keys
-type RawReport = HashMap<String, HashMap<String, Vec<Text>>>;
+type Report = HashMap<String, HashMap<String, Vec<Text>>>;
 
 /// The running state kept during report construction
 #[derive(Default, Clone, Serialize)]
@@ -67,7 +23,7 @@ struct State {
 }
 
 /// Generate a new report for the commits with the given configuration
-pub fn generate<'a>(config: &'a Configuration, commits: &'a [Commit]) -> Report<'a> {
+pub fn generate<'a>(config: &'a Configuration, commits: &'a [Commit]) -> ChangeLog<'a> {
     // First pass - categorize
     let raw_report = first_pass(config, commits);
 
@@ -75,13 +31,13 @@ pub fn generate<'a>(config: &'a Configuration, commits: &'a [Commit]) -> Report<
     let scopes = second_pass(config, &raw_report);
 
     // Done
-    Report { commits, scopes }
+    ChangeLog { commits, scopes }
 }
 
 /// The first pass - walks through commits and gathers scopes and categories.
-fn first_pass(config: &Configuration, commits: &[Commit]) -> RawReport {
+fn first_pass(config: &Configuration, commits: &[Commit]) -> Report {
     // A running raw report
-    let mut raw_report = RawReport::new();
+    let mut raw_report = Report::new();
 
     // A running counter
     let mut sequence = 0;
@@ -119,7 +75,7 @@ fn first_pass(config: &Configuration, commits: &[Commit]) -> RawReport {
 }
 
 /// The second pass takes the raw report and orders things as we want to show them
-fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
+fn second_pass(config: &Configuration, report: &Report) -> Vec<Scope> {
     // The report of all scopes
     let mut scopes = Vec::new();
 
@@ -183,7 +139,7 @@ fn second_pass(config: &Configuration, report: &RawReport) -> Vec<Scope> {
 }
 
 /// Record the current state into the raw report
-fn record(raw: &mut RawReport, config: &Configuration, mut state: State, seq: &mut u32) {
+fn record(raw: &mut Report, config: &Configuration, mut state: State, seq: &mut u32) {
     // Validate the scope with the configuration
     let scope = config::report_title(&config.scopes, &state.scope);
 
