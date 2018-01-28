@@ -9,40 +9,43 @@
 A commit [like this](src/assets/sample-commit.message) generates an output [like
 this](src/assets/sample.md).
 
+[![asciicast](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e.png)](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e)
+
 ## Motivation
 
 Commit messages must always be meaningful and with a little extra effort we can automate the chore
-of generating meaningful change logs for our users. As I finish up work on a change to a repository,
-I like to pause a while, consider what the change means to the end-user and reorganize the message a
-bit. If you follow the (easy) conventions described below and tag lines in your commit message
-appropriately, this tool will help you generate an *accurate* and *presentable* change log.
+of generating meaningful change logs for users. As I finish up work on a change, I like to pause,
+consider what the change means to the end-user and reorganize the message a bit. If you follow the
+(easy) conventions described below and tag lines in your commit message appropriately, this tool
+will help you generate an *accurate* and *presentable* change log.
 
-A little time spent at commit, when the context and impact of the change is fresh in mind, saves a
-lot of time at release milestones.
+A little time spent, when the context and impact of the change is fresh in mind, saves a lot of time
+at release milestones.
 
 ## Installation
+
+The recommended way to install the tool is:
 
 ```bash
 > cargo install git-changelog
 ```
 
-If you use a Mac with [Homebrew], you may prefer the following:
+This compiles the tool for your environment from the sources. 
+
+If you just need the executables, they are attached to the [releases].
+
+If you use a Mac with [Homebrew], you can get the latest release with the following:
 
 ```bash
 > brew tap aldrin/tap
 > brew install git-changelog
 ```
 
-Both options build the executable from sources.
-
-If you're looking for just the executables, they're attached to the [releases].
-
 ## Usage
 
-Just write your commits as you [normally] do. When it looks like a particular commit includes a
-change that the "user" may be interested in, tag its lines appropriately.
-
-Concretely, instead of writing this:
+Just write your commits as you normally [would]. When it looks like a particular commit includes a
+change that the "user" may be interested in, tag its lines appropriately. Concretely, instead of
+writing this:
 
 ```
 Add support for filtering responses
@@ -72,37 +75,53 @@ diligently. Eventually, this diligence helps the tool to identify lines, aggrega
 with users. Or, you can use the output as the starting draft, make editorial changes and then share
 it with users. Either way, it saves you some time.
 
-Of course, you don't need to tag **every** commit (`git commit -m` is perfectly fine, where you
-think it is). You just need to tag the changes you want your users to know about. The quality of the
-tool output depends on the quality of *your* input.
+You don't need to tag **every** commit (`git commit -m` is perfectly fine, where you think it is).
+You just need to tag the changes you want your users to know about. 
+
+> The quality of the tool output depends on the quality of *your* input.
 
 ## Generate reports
 
-When `git-changelog` is on the path, `git changelog` works just like `git log` and takes similar
-arguments. Concretely, it takes a [commit range] and looks for all commits in that range and uses
-the tags it finds in their messages to generate a report. Simple. :)
-
-The default revision range picks all commits made since the *last* tag. For example, to generate the
-changelog for `v0.2.0` of the tool, I used the following:
-
-```bash
-> git changelog
-```
-
-The command picks all commits since [v0.1.1] (the current *last* tag) and generates a change report
-that I pasted verbatim to the [CHANGELOG.md].
+When `git-changelog` is on the path, `git changelog` works like `git log` and takes *similar*
+arguments. It looks at all commits in the given [commit range] and uses the tags it finds in their
+messages to generate a report. Simple. :)
 
 ## Customization
 
 Each project is different and you may want to customize the tags and output to suit your
-requirements. You can do that by adding a [.changelog.yml] file to your repository root. See the
-[default configuration file](src/assets/changelog.yml) for a starting example.
+requirements. 
 
-If you like to tweak the output, you can specify a [Handlebars] template to control the rendered
-report format (using `template` key in your .changelog.yml). The [default
-template](src/assets/changelog.hbs) generates a Markdown document that renders well on Github.
+**Conventions**: You can define change categories and scopes tags and titles relevant to your
+project. Add a [.changelog.yml] file to your repository root (or use the `--config` option).  See
+the [default configuration file](src/assets/changelog.yml) for a starting example.
 
-[normally]:https://chris.beams.io/posts/git-commit/
+**Templates**: You can specify your own [Handlebars] template if the output doesn't work for
+you. Add a `.changelog.hbs` to your repository root or use the `--template` command line option. See
+the [default template](src/assets/changelog.hbs) for a starting example.
+
+**Post Processors**: You can add line post-processors to tweak the output. I use these to simplify
+adding links to bug-tracking systems. For example, the commit message can simply state the ticket
+number:
+
+```
+Fixes: JIRA-1234
+```
+
+Then, with a post-processor like the following in the configuration
+
+```yml
+output:
+  post_processors:
+    - {lookup: "JIRA-(?P<id>\\d+)", replace: "[JIRA-$id](https://jira.company.com/view/JIRA-$id)"}
+```
+
+the tool will emit the following:
+
+```
+Fixes: [JIRA-1234](https://jira.company.com/view/JIRA-1234)
+```
+
+[would]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
 [commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/

@@ -1,27 +1,58 @@
-{{!-- Copyright 2017 Aldrin J D'Souza. --}}
-{{!-- Licensed under the MIT License <https://opensource.org/licenses/MIT> --}}
+{{!
+Copyright 2018 Aldrin J D'Souza.
+Licensed under the MIT License <https://opensource.org/licenses/MIT>
+}}
+{{~#*inline "summaryWithNumberLink" ~}}
+    - [{{{ summary }}}]({{../remote_url}}/pull/{{number}})
+{{/inline~}}
 
-{{!-- The default Markdown report format --}}
-{{#if commits}}
-{{!-- Headlines  --}}
-#### Summary
-{{#each commits }}
-- {{{ summary }}} {{#if number }}(#{{ number }}){{/if ~}} 
+{{~#*inline "summaryWithShaLink" ~}}
+    - [{{{ summary }}}]({{../remote_url}}/commit/{{sha}})
+{{/inline~}}
 
-{{/each ~}}
+{{~#*inline "summaryWithNumber" ~}}
+    - {{{ summary }}} {{#if number}}(#{{number}}){{/if}}
+{{/inline~}}
 
-{{!-- Changes scope --}}
-{{~#each scopes}}
+{{~#*inline "title" ~}}
+    # {{ range }} ({{ date }})
 
-{{#if title}}#### {{{ title }}}{{/if}}
-{{~#each categories }}
-{{#if title}}##### {{{ title }}}{{/if}}
-{{#each changes }}
--{{{ opening ~}}}
-  {{#each rest }}
-  {{{ . ~}}}
-  {{/each}}
-{{/each}}
-{{/each}}
-{{/each}}
-{{/if}}
+{{/inline~}}
+
+{{~#*inline "scopeTitle"}}
+    {{~#if title}}## {{title}}
+    {{/if}}
+{{/inline~}}
+
+{{~#*inline "categoryTitle"}}
+    {{~#if title}}### {{title}}
+    {{/if}}
+{{/inline~}}
+
+{{~#*inline "changes"~}}
+    - {{ tidy-change "  " . }}
+{{/inline~}}
+
+{{~#if commits~}}
+    {{~> title }}
+    {{~#each commits~}}
+        {{~#if ../remote_url~}}
+            {{~#if number ~}}
+                {{~> summaryWithNumberLink ~}}
+            {{~^~}}
+                {{~> summaryWithShaLink ~}}
+            {{~/if~}}
+        {{~^~}}
+            {{~> summaryWithNumber ~}}
+        {{~/if~}}
+    {{~/each~}}
+    {{~#each scopes~}}
+        {{~> scopeTitle ~}}
+        {{~#each categories~}}
+            {{~> categoryTitle ~}}
+            {{~#each changes~}}
+                {{~> changes ~}}
+            {{~/each~}}
+        {{~/each~}}
+    {{~/each~}}
+{{~/if~}}

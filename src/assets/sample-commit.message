@@ -1,4 +1,4 @@
-Demonstrate tagging conventions for commit messages (#6)
+Demonstrate tagging conventions for commit messages
 
 This commit message is long to demonstrate the tool features. *Real*
 commits should follow the standard
@@ -10,7 +10,7 @@ introduces are the tagging prefixes described here.
 be used to categorize changes. Everything that follows the prefix is
 tagged with the chosen category. For example, this text describes the
 tool feature that categorizes changes. Among others, `feature` is an
-out-of-the-box tag defined in the [configuration](config.yml). You can
+out-of-the-box tag defined in the [configuration](changelog.yml). You can
 define tags that make sense for your project.
 
 - feature: *Scoped Changes:* For larger projects, the tool supports
