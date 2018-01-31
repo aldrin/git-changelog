@@ -247,8 +247,11 @@ mod tests {
     #[test]
     fn commit_fetch() {
         use super::{Commit, CommitList};
-        let head = Commit::from("HEAD");
-        let also_head = CommitList::from("HEAD^..HEAD").into_iter().next().unwrap();
+        let head = Commit::from("2c5dda2e");
+        let also_head = CommitList::from("2c5dda2e^..2c5dda2e")
+            .into_iter()
+            .next()
+            .unwrap();
         assert_eq!(head.sha, also_head.sha);
     }
 
