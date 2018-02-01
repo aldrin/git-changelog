@@ -1,14 +1,7 @@
-# Copyright 2017 Aldrin J D'Souza.
+# Copyright 2017-2018 by Aldrin J D'Souza.
 # Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-# This is the changelog configuration file for -this- project
-# If you're looking for the default out-of-the-box configuration
-# used by the tool, see `changelog.yml`.
-categories:
-  - {keyword: "feature", title: "Features"}
-  - {keyword: "break", title: "Breaking Changes"}
-
-post_processors:
-  -
-    lookup: "#(?P<pr>\\d+)"
-    replace: "[#$pr](https://github.com/aldrin/git-changelog/pull/$pr)"
+conventions:
+  categories:
+    - {tag: "feature", title: "Features"}
+    - {tag: "break", title: "Breaking Changes"}

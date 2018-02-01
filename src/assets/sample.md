@@ -1,17 +1,15 @@
-#### Summary
+# 1d82af9^..1d82af9 (2017-10-22)
 
-- Demonstrate tagging conventions for commit messages (#6)
+- [Demonstrate tagging conventions for commit messages](https://github.com/aldrin/git-changelog/commit/1d82af9a1bd05c100b7b50bdcda3db39a5cddcdf)
 
-
-##### Features
-
+### Features
+    
 - *Categorized Changes:* Lines that begin with a `- <tag>:` can
   be used to categorize changes. Everything that follows the prefix is
   tagged with the chosen category. For example, this text describes the
   tool feature that categorizes changes. Among others, `feature` is an
-  out-of-the-box tag defined in the [configuration](config.yml). You can
+  out-of-the-box tag defined in the [configuration](changelog.yml). You can
   define tags that make sense for your project.
-  
 
 - *Scoped Changes:* For larger projects, the tool supports
   another level of organization using *scopes*. For example, projects can
@@ -20,24 +18,19 @@
   goes into the `default` scope. As with tags, you can define scopes that
   make sense for your project like `docs`, `benchmark`, etc. You can also
   ignore them entirely and just use simple category tags.
-  
 
-
-##### Notes
-
+### Notes
+    
 - This commit message is long to demonstrate the tool features. *Real*
   commits should follow the standard
   [guidance](https://chris.beams.io/posts/git-commit/) on writing commit
   messages. The only additional (and optional) conventions this tool
   introduces are the tagging prefixes described here.
-  
 
-
-
-
-#### API
-##### Breaking Changes
-
+## API
+    
+### Breaking Changes
+    
 - This item is an example of a scoped *and* categorized
   change. The text here and all that follows will show up under a
   "Breaking Changes" section in the "API" scope of the project. You can

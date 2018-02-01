@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2017 Aldrin J D'Souza.
+# Copyright 2017-2018 by Aldrin J D'Souza.
 # Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 set -ex

@@ -1,38 +1,33 @@
-// Copyright 2017 Aldrin J D'Souza.
-// Licensed under the MIT License <https://opensource.org/licenses/MIT>
 extern crate changelog;
+extern crate difference;
 extern crate env_logger;
 extern crate log;
 
+use changelog::*;
+
 #[test]
-fn generate_changelog() {
-    use std::env::current_dir;
-    use env_logger::LogBuilder;
-    use log::LogLevelFilter;
+fn readme_example() {
+    let config = builtin_config();
+    let commits = vec![readme_commit()];
+    let mut log = ChangeLog::from(commits.into_iter(), &config);
+    log.range = String::from("1d82af9^..1d82af9");
+    let md = render(&log, &config.output).unwrap();
+    let expected = include_str!("../src/assets/sample.md");
+    let diff = difference::Changeset::new(expected, &md, " ");
+    assert_eq!(diff.diffs.len(), 1, "{:#?}", diff.diffs);
+}
 
-    let mut builder = LogBuilder::new();
-    builder.filter(Some("changelog"), LogLevelFilter::Info);
-    builder.init().unwrap();
+fn builtin_config() -> Configuration {
+    Configuration::from_yaml(include_str!("../src/assets/changelog.yml")).unwrap()
+}
 
-    let sha = "1d82af9a1bd05c100b7b50bdcda3db39a5cddcdf";
-    let range = format!("{}...{}^", sha, sha);
-    let dir = current_dir().unwrap();
-
-    // Choice 1 -- generate using template
-    let mut input = changelog::Input::default();
-    input.revision_range = Some(vec![range.clone()]);
-    input.config_file = Some(String::from("src/assets/changelog.yml"));
-    input.output_template_file = Some(String::from("src/assets/changelog.hbs"));
-    let output = changelog::run(input, &dir);
-    assert!(output.is_ok());
-    println!("{}", output.unwrap());
-
-    // Choice 2 -- generate as JSON
-    let mut input = changelog::Input::default();
-    input.output_json = true;
-    input.revision_range = Some(vec![range.clone()]);
-    input.config_file = Some(String::from("src/assets/changelog.yml"));
-    let output = changelog::run(input, &dir);
-    assert!(output.is_ok());
-    println!("{}", output.unwrap());
+fn readme_commit() -> Commit {
+    let mut commit = vec![
+        "1d82af9a1bd05c100b7b50bdcda3db39a5cddcdf",
+        "aaaaaa a a'aaaaa",
+        "Sun, 22 Oct 2017 17:26:56 -0400",
+    ];
+    commit.extend(include_str!("../src/assets/sample-commit.message").lines());
+    let commit: Vec<String> = commit.into_iter().map(str::to_string).collect();
+    Commit::from_lines(commit)
 }

@@ -1,47 +1,18 @@
-# Copyright 2017 Aldrin J D'Souza.
+# Copyright 2017-2018 by Aldrin J D'Souza.
 # Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-# The out of the box configuration for git-changelog.  This
-# file contains the configuration the tool runs with unless
-# you override it by: (1) passing a `-c` or `--config`
-# argument at the command line, or (2) adding a
-# `.changelog.yml` file in your git repository.
-
-## Project Conventions
-
-# The category tags and their titles.
-
-# Changes are grouped by title so you can put items tagged
-# with different keywords (e.g. break and braek) into the
-# same report section by giving them the same title.
-
-# Items tagged with keywords not on the list (e.g. chore)
-# will be skipped from the final report.
-
-# The item with an empty string keyword applies to lines
-# that have no explicit tags.
-
-# The sequence of tag definitions here controls the order in
-# which the tags will show up in the final report.
-categories:
-  - {keyword: "security", title: "Security Updates"}
-  - {keyword: "break", title: "Breaking Changes"}
-  - {keyword: "feature", title: "Features"}
-  - {keyword: "fix", title: "Fixes"}
-  - {keyword: "", title: "Notes"}
-  - {keyword: "add", title: "Additions"}
-  - {keyword: "remove", title: "Removals"}
-  - {keyword: "deprecate", title: "Deprecations"}
-
-# The scope tags and their titles.
-
-# The scope configuration follows the same conventions as
-# category. Remember that if you don't use scopes all items
-# are tagged under the default scope (i.e. keyword="").
-scopes:
-  - {keyword: "", title: ""}
-  - {keyword: "api", title: "API"}
-  - {keyword: "doc", title: "Documentation"}
-
-# The date format
-date_format: "%Y-%m-%d %H:%M"
+# The out-of-the-box configuration bundled with the changelog library
+conventions:
+  categories:
+    - {tag: "security", title: "Security Updates"}
+    - {tag: "break", title: "Breaking Changes"}
+    - {tag: "feature", title: "Features"}
+    - {tag: "fix", title: "Fixes"}
+    - {tag: "", title: "Notes"}
+    - {tag: "add", title: "Additions"}
+    - {tag: "remove", title: "Removals"}
+    - {tag: "deprecate", title: "Deprecations"}
+  scopes:
+    - {tag: "", title: ""}
+    - {tag: "api", title: "API"}
+    - {tag: "doc", title: "Documentation"}

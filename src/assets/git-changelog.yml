@@ -4,7 +4,7 @@ args:
         short: c
         long: config
         value_name: FILE
-        help: Sets a custom configuration file
+        help: Sets a custom project conventions file
         takes_value: true
     - template:
         short: t
@@ -15,12 +15,20 @@ args:
     - json:
         short: j
         long: json
-        help: Generate report as JSON
+        help: Generates report as JSON
+        conflicts_with: template
+    - remote:
+        short: r
+        long: remote
+        value_name: REMOTE
+        takes_value: true
+        help: Sets a remote name form change links
     - debug:
         short: d
         long: debug
         multiple: true
         help: Enables debug logs
-    - RANGE:
-        help: Sets the revision range for commits (same as `git log`)
+    - range:
+        help: Picks a revision range
+        value_name: RANGE
         multiple: true

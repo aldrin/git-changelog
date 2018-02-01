@@ -1,52 +1,126 @@
-// Copyright 2017 Aldrin J D'Souza.
+// Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-/// Commit parser
-use std::str;
-use super::{Commit, Line};
-use chrono::{DateTime, Local};
+// Commit fetch and parsing logic
+use git;
+use std::{fmt, str};
 use nom::{is_alphanumeric, IResult};
 
-/// Parse the commit message to a Commit object
-pub fn parse(lines: &[String], dt_format: &str) -> Commit {
-    // Parsed commit
-    Commit {
-        // First line is the SHA
-        sha: lines[0].clone(),
+/// A single commit
+#[derive(Debug, Default, Serialize)]
+pub struct Commit {
+    /// The SHA
+    pub sha: String,
 
-        // Second line is the author
-        author: lines[1].clone(),
+    /// The author
+    pub author: String,
 
-        // An optional change number (e.g. PR, issue number in Github)
-        number: parse_number(&lines[3]),
+    /// The timestamp
+    pub time: String,
 
-        // The change message summary
-        summary: parse_subject(&lines[3]),
+    /// The summary
+    pub summary: String,
 
-        // Parse the timestamp
-        time: parse_time(&lines[2], dt_format),
+    /// The change number
+    pub number: Option<u32>,
 
-        // Parse the rest of the message lines
-        lines: lines[4..].iter().map(|s| parse_line(s)).collect(),
+    /// The message
+    pub message: String,
+}
+
+/// A list of commit revisions
+pub struct CommitList(Vec<String>);
+
+/// The commit message
+pub struct CommitMessage<'a>(Vec<&'a str>);
+
+/// A single line in a commit change message
+#[derive(Default, Debug)]
+pub struct Line {
+    /// The scope
+    pub scope: Option<String>,
+
+    /// The category
+    pub category: Option<String>,
+
+    /// The text
+    pub text: Option<String>,
+}
+
+impl<T: AsRef<str>> From<T> for Commit {
+    /// Construct a commit from the revision
+    fn from(input: T) -> Self {
+        let revision = input.as_ref();
+        match git::get_commit_message(revision) {
+            Ok(lines) => Commit::from_lines(lines),
+            Err(why) => {
+                error!("Commit {} will be skipped (Reason: {})", revision, why);
+                Commit::default()
+            }
+        }
     }
 }
 
-/// Parse the commit timestamp to local time
-fn parse_time(line: &str, format: &str) -> String {
-    // Parse the git timestamp string
-    DateTime::parse_from_rfc2822(line)
+impl Commit {
+    pub fn from_lines(mut lines: Vec<String>) -> Self {
+        let mut commit = Self::default();
 
-        // Convert to local time zone
-        .map(|t| t.with_timezone(&Local))
+        commit.sha = lines.remove(0);
+        commit.author = lines.remove(0);
+        commit.time = lines.remove(0);
 
-        // If that fails, assume "now"
-        .unwrap_or_else(|_| Local::now())
+        let subject = lines.remove(0);
+        commit.number = parse_number(&subject);
+        commit.summary = parse_subject(&subject);
+        commit.message = lines.join("\n");
 
-        // Render with the given format
-        .format(format)
+        commit
+    }
+}
 
-        // Done
-        .to_string()
+impl<T: AsRef<str>> From<T> for CommitList {
+    fn from(input: T) -> Self {
+        let range = input.as_ref();
+        CommitList(match git::commits_in_range(range) {
+            Ok(shas) => shas,
+            Err(why) => {
+                error!("Invalid range {} (Reason: {})", range, why);
+                vec![]
+            }
+        })
+    }
+}
+
+impl Iterator for CommitList {
+    type Item = Commit;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.pop().map(Commit::from)
+    }
+}
+
+impl<'a> IntoIterator for &'a Commit {
+    type Item = Line;
+    type IntoIter = CommitMessage<'a>;
+    fn into_iter(self) -> Self::IntoIter {
+        CommitMessage(self.message.lines().collect())
+    }
+}
+
+impl<'a> Iterator for CommitMessage<'a> {
+    type Item = Line;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.0.is_empty() {
+            None
+        } else {
+            Some(parse_line(self.0.remove(0)))
+        }
+    }
+}
+
+impl fmt::Display for Commit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}:{}", self.sha, self.summary)
+    }
 }
 
 /// Parse the commit subject removing the numbers tags.
@@ -170,6 +244,29 @@ named!(tagname<&str, String>,
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn commit_fetch() {
+        use super::{Commit, CommitList};
+        let head = Commit::from("2c5dda2e");
+        let also_head = CommitList::from("2c5dda2e^..2c5dda2e")
+            .into_iter()
+            .next()
+            .unwrap();
+        assert_eq!(head.sha, also_head.sha);
+    }
+
+    #[test]
+    fn negative() {
+        assert!(super::Commit::from("no-such-commit").summary.is_empty());
+        assert_eq!(super::CommitList::from("bad-range").into_iter().count(), 0);
+    }
+
+    #[test]
+    fn commit_lines() {
+        use super::Commit;
+        let reference = &Commit::from("2c5dda2e5ec6d0ad7abdcd20661bf2cb846ee5f2");
+        assert_eq!(reference.into_iter().count(), 17);
+    }
 
     #[test]
     fn commit_parse_summary() {
@@ -189,11 +286,6 @@ mod tests {
         let message = "foo bar #123 (#101)(#103)";
         assert_eq!(parse_subject(message), "foo bar #123");
         assert_eq!(parse_number(message), Some(103));
-    }
-
-    #[test]
-    fn parse_time_can_handle_bad_timestamps() {
-        assert!(!super::parse_time("huh?", "YYYY-MM-DD").is_empty());
     }
 
     #[test]

@@ -1,28 +1,50 @@
-// Copyright 2017 Aldrin J D'Souza.
+// Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-// Output concerns
-use handlebars::Handlebars;
+/// All output concerns.
 use regex::Regex;
-use super::{ChangeLog, PostProcessor};
-use std::io::{Error, ErrorKind};
+use handlebars::{Handlebars, Helper, RenderContext, RenderError};
+use serde_json::to_string_pretty;
+use super::Result;
+use changelog::ChangeLog;
+use input::{OutputPreferences, PostProcessor};
 
-pub fn from_hbs(given: Option<String>) -> Result<Handlebars, Error> {
-    let mut hbs = Handlebars::new();
-    let md = given.unwrap_or_else(|| String::from(include_str!("assets/changelog.hbs")));
-    hbs.register_template_string("default", md).map_err(|e| {
-        error!("Invalid handlebar template: '{}'", e);
-        Error::from(ErrorKind::InvalidInput)
-    })?;
-    Ok(hbs)
+type RenderResult = ::std::result::Result<(), RenderError>;
+
+/// Render the changelog with the given output preferences
+pub fn render(clog: &ChangeLog, out: &OutputPreferences) -> Result<String> {
+    // Depending on the output format, render the log to text
+    let text = if out.json {
+        to_string_pretty(clog).map_err(|e| format_err!("JSON render failed: {}", e))
+    } else {
+        let mut hbs = Handlebars::new();
+        hbs.register_helper("tidy-change", Box::new(tidy));
+        hbs.template_render(&out.get_template()?, clog)
+            .map_err(|e| format_err!("Handlebar render failed: {}", e))
+    };
+
+    // Run the post processors on the output
+    text.map(|s| post_process(&s, &out.post_processors))
 }
 
-pub fn render(log: &ChangeLog, hbs: &Handlebars) -> String {
-    hbs.render("default", log).unwrap().trim().to_string()
+/// A handlebar helper to tidy up markdown lists used to render changes.
+fn tidy(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> RenderResult {
+    if let Some(indent) = h.param(0).and_then(|v| v.value().as_str()) {
+        if let Some(text) = h.param(1).and_then(|v| v.value().as_str()) {
+            let mut lines = text.lines();
+            if let Some(first) = lines.next() {
+                writeln!(rc.writer, "{}", first.trim())?;
+            }
+            for line in lines {
+                writeln!(rc.writer, "{}{}", indent, line)?;
+            }
+        }
+    }
+    Ok(())
 }
 
-/// Postprocess the output before printing it out
-pub fn postprocess(post_processors: &[PostProcessor], output: &str) -> String {
+/// Post process the output before returning it
+fn post_process(output: &str, post_processors: &[PostProcessor]) -> String {
     // Compile the post processor regular expressions
     let mut processors = Vec::new();
     for processor in post_processors {
@@ -63,27 +85,21 @@ pub fn postprocess(post_processors: &[PostProcessor], output: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::PostProcessor;
 
     #[test]
-    fn from_hbs() {
-        use super::from_hbs;
-        assert!(from_hbs(None).is_ok());
-        assert!(from_hbs(Some(String::from("{{bad"))).is_err());
-    }
-
-    #[test]
-    fn postprocess() {
+    fn post_process() {
         let input = String::from("Fixed JIRA-1234\nfoo");
-        let mut jira = super::PostProcessor::default();
+        let mut jira = PostProcessor::default();
         jira.lookup = r"JIRA-(?P<t>\d+)".to_string();
         jira.replace = r"[JIRA-$t](https://our.jira/$t)".to_string();
-        let out = super::postprocess(&vec![jira], &input);
+        let out = super::post_process(&input, &vec![jira]);
         assert_eq!(&out, "Fixed [JIRA-1234](https://our.jira/1234)\nfoo");
 
-        let mut bad = super::PostProcessor::default();
+        let mut bad = PostProcessor::default();
         bad.lookup = r"JIRA-?(P<t\d+".to_string();
         bad.replace = r"whatever".to_string();
-        let out = super::postprocess(&vec![bad], &input);
+        let out = super::post_process(&input, &vec![bad]);
         assert_eq!(&out, &input);
     }
 }
