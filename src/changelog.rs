@@ -10,7 +10,7 @@ use chrono::prelude::*;
 use input::{Configuration, Conventions};
 
 /// A categorized changelog
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Eq, PartialEq)]
 pub struct ChangeLog {
     /// A list of scoped changes in the commit range.
     pub scopes: Vec<Scope>,
@@ -29,7 +29,7 @@ pub struct ChangeLog {
 }
 
 /// Changes grouped by scope (e.g. "API", "Documentation", etc.).
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Eq, PartialEq)]
 pub struct Scope {
     /// The title of the scope, as defined in [`Conventions`](struct.Conventions.html).
     pub title: String,
@@ -38,8 +38,8 @@ pub struct Scope {
     pub categories: Vec<Category>,
 }
 
-/// A  grouped by categories (e.g. "Fixes", "Breaking Changes", etc.).
-#[derive(Debug, Default, Serialize)]
+/// Changes grouped by categories (e.g. "Fixes", "Breaking Changes", etc.).
+#[derive(Debug, Default, Serialize, Eq, PartialEq)]
 pub struct Category {
     /// The title of the category, as defined in [`Conventions`](struct.Conventions.html).
     pub title: String,
@@ -49,6 +49,11 @@ pub struct Category {
 }
 
 impl ChangeLog {
+    /// Generate a new changelog for the default input range
+    pub fn new() -> Self {
+        Self::from_range(String::default(), &Configuration::new())
+    }
+
     /// Create a changelog from the given range
     pub fn from_range(mut range: String, config: &Configuration) -> Self {
         // If none was given

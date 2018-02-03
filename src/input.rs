@@ -40,7 +40,7 @@ pub struct Configuration {
 
 /// The change categorization conventions used by a repository/project.
 #[serde(default)]
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Eq, PartialEq)]
 pub struct Conventions {
     /// The scope keywords
     pub scopes: Vec<Keyword>,
@@ -51,7 +51,7 @@ pub struct Conventions {
 
 /// A keyword used to categorize commit message lines.
 #[serde(default)]
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 pub struct Keyword {
     /// The identifying tag used in commit messages.
     pub tag: String,
@@ -62,7 +62,7 @@ pub struct Keyword {
 
 /// The output preferences
 #[serde(default)]
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Eq, PartialEq)]
 pub struct OutputPreferences {
     /// Output as JSON
     pub json: bool,
@@ -79,7 +79,7 @@ pub struct OutputPreferences {
 
 /// A post-processor definition.
 #[serde(default)]
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Eq, PartialEq)]
 pub struct PostProcessor {
     /// The lookup pattern
     pub lookup: String,
@@ -89,9 +89,9 @@ pub struct PostProcessor {
 }
 
 impl Configuration {
-    /// Construct from the given YAML string
-    pub fn from_yaml(yml: &str) -> Result<Self> {
-        from_str(yml).map_err(|e| format_err!("Configuration contains invalid YAML: {}", e))
+    /// Default constructor
+    pub fn new() -> Self {
+        Self::from_file(None).unwrap_or_else(|_| Self::default())
     }
 
     /// Construct from the given YAML file
@@ -100,6 +100,11 @@ impl Configuration {
             .or_else(|| find_file(CONFIG_FILE))
             .map_or_else(|| Ok(String::from(CONFIG_DEFAULT)), |f| read_file(&f))
             .and_then(|yml| Self::from_yaml(&yml))
+    }
+
+    /// Construct from the given YAML string
+    pub fn from_yaml(yml: &str) -> Result<Self> {
+        from_str(yml).map_err(|e| format_err!("Configuration contains invalid YAML: {}", e))
     }
 }
 
@@ -152,7 +157,22 @@ impl Conventions {
     }
 }
 
+impl Keyword {
+    /// Construct a keyword from the tag and title
+    pub fn new<T: ToString>(tag: T, title: T) -> Self {
+        Keyword {
+            tag: tag.to_string(),
+            title: title.to_string(),
+        }
+    }
+}
+
 impl OutputPreferences {
+    /// Default constructor
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Get the template definition
     pub fn get_template(&self) -> Result<String> {
         self.template

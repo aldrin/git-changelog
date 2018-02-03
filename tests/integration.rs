@@ -3,6 +3,8 @@ extern crate difference;
 extern crate env_logger;
 extern crate log;
 
+extern crate version_sync;
+
 use changelog::*;
 
 #[test]
@@ -15,6 +17,38 @@ fn readme_example() {
     let expected = include_str!("../src/assets/sample.md");
     let diff = difference::Changeset::new(expected, &md, " ");
     assert_eq!(diff.diffs.len(), 1, "{:#?}", diff.diffs);
+}
+
+#[test]
+fn library_example() {
+    // Create a custom configuration
+    let mut config = Configuration::new();
+
+    // Pick the category or scope keywords that match your project conventions
+    config
+        .conventions
+        .categories
+        .push(Keyword::new("feature", "New Features"));
+    config
+        .conventions
+        .categories
+        .push(Keyword::new("break", "Breaking Changes"));
+
+    // Pick the range of commits
+    let range = String::from("v0.1.1..v0.2.0");
+
+    // Generate a changelog for the range with the configuration
+    let changelog = ChangeLog::from_range(range, &config);
+
+    // Print
+    println!("{}", changelog);
+    println!("{:#?}", changelog);
+}
+
+#[test]
+fn test_html_root_url() {
+    use version_sync::check_html_root_url;
+    assert!(check_html_root_url("src/lib.rs", "changelog", env!("CARGO_PKG_VERSION")).is_ok());
 }
 
 fn builtin_config() -> Configuration {
