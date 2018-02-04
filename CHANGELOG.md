@@ -1,3 +1,22 @@
+## v0.3.0 (2018-02-01)
+
+- [Restructure inputs and outputs](https://github.com/aldrin/git-changelog/pull/12)
+
+#### Features
+    
+- Markdown output is tidier as includes revision range and timestamps in
+  the generated report. The report can also be produced to JSON to
+  support dynamic renderings (if required).
+
+#### Breaking Changes
+    
+- The input to the tool is rearranged and now separates project
+  conventions from output preferences under separate YAML nodes. This
+  implies that external configuration files would require some
+  tweaks. See [.changelog.yml](.changelog.yml) and
+  [src/assets/changelog.yml](src/assets/changelog.yml) for the new
+  format.
+
 ## 0.2.1 (2017-12-23)
 
 #### Summary

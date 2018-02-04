@@ -2,6 +2,7 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 /// All output concerns.
+use std::fmt;
 use regex::Regex;
 use handlebars::{Handlebars, Helper, RenderContext, RenderError};
 use serde_json::to_string_pretty;
@@ -41,6 +42,16 @@ fn tidy(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> RenderResult {
         }
     }
     Ok(())
+}
+
+impl fmt::Display for ChangeLog {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let out = OutputPreferences::default();
+        match render(self, &out) {
+            Ok(fine) => write!(f, "{}", fine),
+            Err(err) => write!(f, "Error: {}", err),
+        }
+    }
 }
 
 /// Post process the output before returning it

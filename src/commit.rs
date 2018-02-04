@@ -1,13 +1,12 @@
 // Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
-
 // Commit fetch and parsing logic
 use git;
 use std::{fmt, str};
 use nom::{is_alphanumeric, IResult};
 
 /// A single commit
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Eq, PartialEq)]
 pub struct Commit {
     /// The SHA
     pub sha: String,

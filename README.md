@@ -30,11 +30,10 @@ The recommended way to install the tool is:
 > cargo install git-changelog
 ```
 
-This compiles the tool for your environment from the sources. 
+This compiles the tool for your environment from the sources. If you just need the executables, see
+[releases].
 
-If you just need the executables, they are attached to the [releases].
-
-If you use a Mac with [Homebrew], you can get the latest release with the following:
+If you use a Mac with [Homebrew], you can get the latest binaries with the following:
 
 ```bash
 > brew tap aldrin/tap
@@ -43,9 +42,9 @@ If you use a Mac with [Homebrew], you can get the latest release with the follow
 
 ## Usage
 
-Just write your commits as you normally [would]. When it looks like a particular commit includes a
-change that the "user" may be interested in, tag its lines appropriately. Concretely, instead of
-writing this:
+Write your commits as you normally do (or [should]🙂). When it looks like a particular commit
+includes a change that the "user" may be interested in, tag its lines appropriately. Concretely,
+instead of writing this:
 
 ```
 Add support for filtering responses
@@ -84,7 +83,7 @@ You just need to tag the changes you want your users to know about.
 
 When `git-changelog` is on the path, `git changelog` works like `git log` and takes *similar*
 arguments. It looks at all commits in the given [commit range] and uses the tags it finds in their
-messages to generate a report. Simple. :)
+messages to generate a report. Simple. 🙂
 
 ## Customization
 
@@ -121,7 +120,7 @@ the tool will emit the following:
 Fixes: [JIRA-1234](https://jira.company.com/view/JIRA-1234)
 ```
 
-[would]:https://chris.beams.io/posts/git-commit/
+[should]:https://chris.beams.io/posts/git-commit/
 [changelog]: http://keepachangelog.com/
 [commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
