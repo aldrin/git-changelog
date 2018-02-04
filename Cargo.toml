@@ -1,5 +1,5 @@
 [package]
-version     = "0.3.0"
+version     = "0.3.1-nightly"
 name        = "git-changelog"
 authors     = ["Aldrin J D'Souza <code@aldrin.co>"]
 description = "A tool to automate project changelog generation."
@@ -13,7 +13,6 @@ categories  = ["command-line-utilities", "development-tools"]
 [dependencies]
 log          = "0.3"
 nom          = "3.2"
-clap         = { version = "2", features = ["yaml"] }
 chrono       = "0.4"
 regex        = "0.2"
 serde        = "1.0"
@@ -24,10 +23,10 @@ env_logger   = "0.3"
 serde_yaml   = "0.7"
 serde_json   = "1.0"
 serde_derive = "1.0"
+clap         = { version = "2", features = ["yaml"] }
 
 [dev-dependencies]
 difference   = "1.0"
-version-sync = "0.5"
 
 [lib]
 name = "changelog"

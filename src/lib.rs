@@ -1,6 +1,5 @@
 // Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
-#![doc(html_root_url = "https://docs.rs/changelog/0.3.0")]
 //! A generator for categorized change logs.
 //!
 //! This crate generates change logs (a.k.a release notes) that are typically distributed at project release
