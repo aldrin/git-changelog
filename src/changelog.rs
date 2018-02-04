@@ -140,7 +140,7 @@ struct RawReport<'a> {
     slots: HashMap<&'a str, HashMap<&'a str, Vec<String>>>,
 }
 
-impl<'x> RawReport<'x> {
+impl<'a> RawReport<'a> {
     /// Initialize a new report
     fn new() -> Self {
         Self {
@@ -150,7 +150,7 @@ impl<'x> RawReport<'x> {
     }
 
     /// A the given commit to the report with the given conventions
-    fn add<'a>(&mut self, commit: &'a Commit, conventions: &'x Conventions) -> bool {
+    fn add<'c>(&mut self, commit: &'c Commit, conventions: &'a Conventions) -> bool {
         // Track if this commit brought anything interesting
         let mut interesting = false;
 
@@ -201,7 +201,7 @@ impl<'x> RawReport<'x> {
     }
 
     /// Record the current line into the report
-    fn record(&mut self, current: Line, conventions: &'x Conventions) -> bool {
+    fn record(&mut self, current: Line, conventions: &'a Conventions) -> bool {
         // Get the titles and for the current scope and category
         let scope = conventions.scope_title(current.scope);
         let category = conventions.category_title(current.category);

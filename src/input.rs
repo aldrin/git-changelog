@@ -159,10 +159,10 @@ impl Conventions {
 
 impl Keyword {
     /// Construct a keyword from the tag and title
-    pub fn new<T: ToString>(tag: T, title: T) -> Self {
+    pub fn new<T: AsRef<str>>(tag: T, title: T) -> Self {
         Keyword {
-            tag: tag.to_string(),
-            title: title.to_string(),
+            tag: tag.as_ref().to_owned(),
+            title: title.as_ref().to_owned(),
         }
     }
 }
