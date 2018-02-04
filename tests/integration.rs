@@ -3,8 +3,6 @@ extern crate difference;
 extern crate env_logger;
 extern crate log;
 
-extern crate version_sync;
-
 use changelog::*;
 
 #[test]
@@ -43,12 +41,6 @@ fn library_example() {
     // Print
     println!("{}", changelog);
     println!("{:#?}", changelog);
-}
-
-#[test]
-fn test_html_root_url() {
-    use version_sync::check_html_root_url;
-    assert!(check_html_root_url("src/lib.rs", "changelog", env!("CARGO_PKG_VERSION")).is_ok());
 }
 
 fn builtin_config() -> Configuration {
