@@ -1,4 +1,4 @@
-# v0.3.1 (2018-02-17)
+## v0.3.1 (2018-02-17)
 
 - [Accept all that `git log` can accept to pick commits](https://github.com/aldrin/git-changelog/pull/15)
 
