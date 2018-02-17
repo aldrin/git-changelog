@@ -16,9 +16,11 @@ pub fn last_tag() -> Result<Option<String>> {
     last_tags(1).map(|mut v| v.pop())
 }
 
-/// Get the SHAs for all commits in the revision range
-pub fn commits_in_range(range: &str) -> Result<Vec<String>> {
-    git(&["log", "--format=format:%H", range]).map(|o| read_lines(&o))
+/// Get the SHAs for all commits returned by `git log <args>`
+pub fn commits_in_log(args: &[String]) -> Result<Vec<String>> {
+    let mut log_args = vec!["log", "--format=format:%H"];
+    log_args.extend(args.iter().map(String::as_str));
+    git(&log_args).map(|o| read_lines(&o))
 }
 
 /// Get the commit message for the given sha
@@ -93,11 +95,21 @@ mod tests {
     }
 
     #[test]
-    fn commits_in_range() {
-        use super::commits_in_range;
-        let commits = commits_in_range("v0.1.1..v0.2.0");
+    fn commits_in_log() {
+        use super::commits_in_log;
+        let mut range = vec![String::from("v0.1.1..v0.2.0")];
+        let commits = commits_in_log(&range);
         assert!(commits.is_ok(), "{:?}", commits);
-        assert_eq!(commits.unwrap().len(), 2);
+        let forward = commits.unwrap();
+        assert_eq!(forward.len(), 2);
+
+        // Add a `git log` option
+        range.push(String::from("--reverse"));
+        let commits = commits_in_log(&range);
+        assert!(commits.is_ok(), "{:?}", commits);
+        let mut backward = commits.unwrap();
+        backward.reverse();
+        assert_eq!(backward, forward);
     }
 
     #[test]

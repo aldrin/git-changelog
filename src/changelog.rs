@@ -51,29 +51,36 @@ pub struct Category {
 impl ChangeLog {
     /// Generate a new changelog for the default input range
     pub fn new() -> Self {
-        Self::from_range(String::default(), &Configuration::new())
+        Self::from_log(Vec::new(), &Configuration::new())
     }
 
-    /// Create a changelog from the given range
-    pub fn from_range(mut range: String, config: &Configuration) -> Self {
-        // If none was given
-        if range.is_empty() {
-            // Use the last available tag as the starting point
+    /// Generate a changelog for the given range
+    pub fn from_range(range: &str, config: &Configuration) -> Self {
+        Self::from_log(vec![range.to_string()], config)
+    }
+
+    /// Create a changelog from the given `git log` arguments
+    pub fn from_log(mut args: Vec<String>, config: &Configuration) -> Self {
+        // The default `git log` behavior is to list _all_ commits
+        if args.is_empty() {
+            // The default `git changelog` behavior is to list _all_ commits since last tag.
             if let Ok(Some(tag)) = git::last_tag() {
-                range = format!("{}..HEAD", tag);
+                args.push(format!("{}..HEAD", tag))
             } else {
-                // No tag found too, just show the last commit
-                range = String::from("HEAD^..HEAD");
+                // If there are no tags, default to the last commit
+                args.push(String::from("HEAD^..HEAD"))
             }
         }
 
-        info!("Using revision range {}", range);
+        let header = args.join(" ");
+        let range = CommitList::from(args);
+        info!("Using revision range '{}'", range);
 
         // Compute the change log
-        let mut log = Self::from(CommitList::from(&range), config);
+        let mut log = Self::from(range, config);
 
         // Record the range we used (it is used by the template)
-        log.range = range;
+        log.range = header;
 
         // Done.
         log
