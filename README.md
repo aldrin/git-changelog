@@ -4,10 +4,20 @@
 [![GitHub release](https://img.shields.io/github/release/aldrin/git-changelog.svg)](https://github.com/aldrin/git-changelog/releases)
 [![codecov](https://codecov.io/gh/aldrin/git-changelog/branch/master/graph/badge.svg)](https://codecov.io/gh/aldrin/git-changelog)
 
-`git-changelog` is a tool to automate repository [changelog] generation.
-
-A commit [like this](src/assets/sample-commit.message) generates an output [like
+`git-changelog` is a tool to generate [change logs] (a.k.a release notes) that are typically
+distributed at project release milestones. Unlike other tools that do the same, this one does not
+require you to follow any particular git workflow conventions. All it assumes is that you'll pick a
+few keywords (or use the built-in ones) to annotate lines in your commit messages. Concretely, a
+commit [like this](src/assets/sample-commit.message) generates an output [like
 this](src/assets/sample.md).
+
+When you wish to record a *user visible* change (e.g. new feature, bug fix, breaking change, etc.)
+you write a normal commit message and annotate some lines in it with your chosen keywords. The
+annotated lines are used at report generation time to organize changes into *categories* and
+*scopes*. The organized changes are then rendered as a pretty and accurate change log. 
+
+Commit messages without tags are quietly ignored and you are free to tag as little or as much as you
+want. Here's a quick demo:
 
 [![asciicast](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e.png)](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e)
 
@@ -81,9 +91,33 @@ You just need to tag the changes you want your users to know about.
 
 ## Generate reports
 
-When `git-changelog` is on the path, `git changelog` works like `git log` and takes *similar*
-arguments. It looks at all commits in the given [commit range] and uses the tags it finds in their
-messages to generate a report. Simple. 🙂
+Once on `PATH`, the tool works like a usual git sub-command (e.g. like `git log`) and takes a
+[revision range] as input. It looks at all commits in the range and uses the keywords it finds in
+their messages to generate the report. Simple. 🙂
+
+```bash
+$ git changelog v0.1.1..v0.2.0
+```
+
+If you don't provide a revision range, `<last-tag>..HEAD` is used. If no tags are defined, just the
+last commit is picked.
+
+```bash
+$ git changelog -d
+INFO: Reading file '/Users/aldrin/Code/git-changelog/.changelog.yml'
+INFO: Using revision range 'v0.2.0..HEAD (15 commits)'
+...
+```
+
+Note that using `-d` gives you some insight into the tool operations. 
+
+For more complex range selections you can use `git log` arguments as shown below:
+
+```bash
+$ git changelog -- --author aldrin --reverse --since "1 month ago"
+```
+
+Note the `--` before you start the `git log` arguments.
 
 ## Customization
 
@@ -96,7 +130,10 @@ the [default configuration file](src/assets/changelog.yml) for a starting exampl
 
 **Templates**: You can specify your own [Handlebars] template if the output doesn't work for
 you. Add a `.changelog.hbs` to your repository root or use the `--template` command line option. See
-the [default template](src/assets/changelog.hbs) for a starting example.
+the [default template](src/assets/changelog.hbs) for a starting example and the [library
+documentation] for details on the input data-structure.
+
+**JSON**: You can skip Markdown completely and ask for a JSON output with the `--json` flag.
 
 **Post Processors**: You can add line post-processors to tweak the output. I use these to simplify
 adding links to bug-tracking systems. For example, the commit message can simply state the ticket
@@ -106,7 +143,7 @@ number:
 Fixes: JIRA-1234
 ```
 
-Then, with a post-processor like the following in the configuration
+Then, with a post-processor like the following in the configuration file:
 
 ```yml
 output:
@@ -114,18 +151,18 @@ output:
     - {lookup: "JIRA-(?P<id>\\d+)", replace: "[JIRA-$id](https://jira.company.com/view/JIRA-$id)"}
 ```
 
-the tool will emit the following:
+the tool replaces it with:
 
 ```
 Fixes: [JIRA-1234](https://jira.company.com/view/JIRA-1234)
 ```
 
 [should]:https://chris.beams.io/posts/git-commit/
-[changelog]: http://keepachangelog.com/
-[commit range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
+[library documentation]: https://docs.rs/git-changelog/0.3.1/changelog/struct.ChangeLog.html
+[change logs]: http://keepachangelog.com/
+[revision range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
 [Homebrew]: https://brew.sh/
 [CHANGELOG.md]: CHANGELOG.md
-[v0.1.1]: https://github.com/aldrin/git-changelog/tree/v0.1.1
 [.changelog.yml]: .changelog.yml
 [releases]:https://github.com/aldrin/git-changelog/releases

@@ -33,7 +33,7 @@ fn library_example() {
         .push(Keyword::new("break", "Breaking Changes"));
 
     // Pick the range of commits
-    let range = String::from("v0.1.1..v0.2.0");
+    let range = "v0.1.1..v0.2.0";
 
     // Generate a changelog for the range with the configuration
     let changelog = ChangeLog::from_range(range, &config);

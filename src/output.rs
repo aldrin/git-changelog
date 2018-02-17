@@ -6,9 +6,7 @@ use std::fmt;
 use regex::Regex;
 use handlebars::{Handlebars, Helper, RenderContext, RenderError};
 use serde_json::to_string_pretty;
-use super::Result;
-use changelog::ChangeLog;
-use input::{OutputPreferences, PostProcessor};
+use super::{ChangeLog, OutputPreferences, PostProcessor, Result};
 
 type RenderResult = ::std::result::Result<(), RenderError>;
 

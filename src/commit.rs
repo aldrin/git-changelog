@@ -28,7 +28,13 @@ pub struct Commit {
 }
 
 /// A list of commit revisions
-pub struct CommitList(Vec<String>);
+pub struct CommitList {
+    /// The log command
+    input: String,
+
+    /// The commits in the log
+    commits: Vec<String>,
+}
 
 /// The commit message
 pub struct CommitMessage<'a>(Vec<&'a str>);
@@ -77,23 +83,35 @@ impl Commit {
     }
 }
 
-impl<T: AsRef<str>> From<T> for CommitList {
-    fn from(input: T) -> Self {
-        let range = input.as_ref();
-        CommitList(match git::commits_in_range(range) {
-            Ok(shas) => shas,
+impl<'a> From<&'a str> for CommitList {
+    /// Convenience constructor from a simple range
+    fn from(range: &str) -> Self {
+        Self::from(vec![range.to_string()])
+    }
+}
+
+impl From<Vec<String>> for CommitList {
+    /// Generate a commit list from the list of strings, interpreting them as `git log` arguments.
+    fn from(git_log_args: Vec<String>) -> Self {
+        // Record the log input
+        let input = git_log_args.join(" ");
+
+        // Get the commits that `git log` would have returned
+        let commits = match git::commits_in_log(&git_log_args) {
+            Ok(commits) => commits,
             Err(why) => {
-                error!("Invalid range {} (Reason: {})", range, why);
+                error!("Invalid log input {} (Reason: {})", input, why);
                 vec![]
             }
-        })
+        };
+        CommitList { commits, input }
     }
 }
 
 impl Iterator for CommitList {
     type Item = Commit;
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.pop().map(Commit::from)
+        self.commits.pop().map(Commit::from)
     }
 }
 
@@ -119,6 +137,12 @@ impl<'a> Iterator for CommitMessage<'a> {
 impl fmt::Display for Commit {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}:{}", self.sha, self.summary)
+    }
+}
+
+impl fmt::Display for CommitList {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} ({} commits)", self.input, self.commits.len())
     }
 }
 
@@ -247,11 +271,11 @@ mod tests {
     fn commit_fetch() {
         use super::{Commit, CommitList};
         let head = Commit::from("2c5dda2e");
-        let also_head = CommitList::from("2c5dda2e^..2c5dda2e")
-            .into_iter()
-            .next()
-            .unwrap();
+        let list = CommitList::from("2c5dda2e^..2c5dda2e");
+        assert_eq!(list.to_string(), "2c5dda2e^..2c5dda2e (1 commits)");
+        let also_head = list.into_iter().next().unwrap();
         assert_eq!(head.sha, also_head.sha);
+        assert!(head.to_string().starts_with("2c5dda2e"));
     }
 
     #[test]
