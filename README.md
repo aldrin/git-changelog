@@ -14,10 +14,10 @@ this](src/assets/sample.md).
 When you wish to record a *user visible* change (e.g. new feature, bug fix, breaking change, etc.)
 you write a normal commit message and annotate some lines in it with your chosen keywords. The
 annotated lines are used at report generation time to organize changes into *categories* and
-*scopes*. The organized changes are then rendered as a pretty and accurate change log. Commit
-messages without tags are quietly ignored and you are free to tag as little or as much as you want.
+*scopes*. The organized changes are then rendered as a pretty and accurate change log. 
 
-Here's a quick demo:
+Commit messages without tags are quietly ignored and you are free to tag as little or as much as you
+want. Here's a quick demo:
 
 [![asciicast](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e.png)](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e)
 
@@ -158,12 +158,11 @@ Fixes: [JIRA-1234](https://jira.company.com/view/JIRA-1234)
 ```
 
 [should]:https://chris.beams.io/posts/git-commit/
-[library documentation]: file:///Users/aldrin/Code/git-changelog/target/doc/changelog/struct.ChangeLog.html
+[library documentation]: https://docs.rs/git-changelog/0.3.1/changelog/struct.ChangeLog.html
 [change logs]: http://keepachangelog.com/
 [revision range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#_commit_ranges
 [Handlebars]: http://handlebarsjs.com/
 [Homebrew]: https://brew.sh/
 [CHANGELOG.md]: CHANGELOG.md
-[v0.1.1]: https://github.com/aldrin/git-changelog/tree/v0.1.1
 [.changelog.yml]: .changelog.yml
 [releases]:https://github.com/aldrin/git-changelog/releases
