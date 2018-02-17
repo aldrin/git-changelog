@@ -271,11 +271,11 @@ mod tests {
     fn commit_fetch() {
         use super::{Commit, CommitList};
         let head = Commit::from("2c5dda2e");
-        let also_head = CommitList::from("2c5dda2e^..2c5dda2e")
-            .into_iter()
-            .next()
-            .unwrap();
+        let list = CommitList::from("2c5dda2e^..2c5dda2e");
+        assert_eq!(list.to_string(), "2c5dda2e^..2c5dda2e (1 commits)");
+        let also_head = list.into_iter().next().unwrap();
         assert_eq!(head.sha, also_head.sha);
+        assert!(head.to_string().starts_with("2c5dda2e"));
     }
 
     #[test]
