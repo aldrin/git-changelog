@@ -1,3 +1,27 @@
+# v0.3.1 (2018-02-17)
+
+- [Accept all that `git log` can accept to pick commits](https://github.com/aldrin/git-changelog/pull/15)
+
+### Features
+    
+- The tool now accepts `git log` arguments to choose
+    commits to be included in the report. For example:
+  
+    ```bash
+    # My changes in reverse chronological order
+    > git changelog -- --author aldrin --reverse
+    ```
+  
+    ```bash
+    # All changes since yesterday
+    > git changelog -- --since yesterday
+    ```
+  
+    Note that you need a `--` before you begin `git log` arguments.
+
+- Values for the command line arguments `--template` and
+    `--remote` can now be specified in configuration file as well.
+
 ## v0.3.0 (2018-02-01)
 
 - [Restructure inputs and outputs](https://github.com/aldrin/git-changelog/pull/12)

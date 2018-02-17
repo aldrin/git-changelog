@@ -17,7 +17,9 @@ annotated lines are used at report generation time to organize changes into *cat
 *scopes*. The organized changes are then rendered as a pretty and accurate change log. 
 
 Commit messages without tags are quietly ignored and you are free to tag as little or as much as you
-want. Here's a quick demo:
+want.
+
+Here's a quick demo:
 
 [![asciicast](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e.png)](https://asciinema.org/a/Jk8A5UEJGkhlalL4gl3HevC7e)
 
