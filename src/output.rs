@@ -1,12 +1,12 @@
 // Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
+use super::{ChangeLog, OutputPreferences, PostProcessor, Result};
+use handlebars::{Handlebars, Helper, RenderContext, RenderError};
+use regex::Regex;
+use serde_json::to_string_pretty;
 /// All output concerns.
 use std::fmt;
-use regex::Regex;
-use handlebars::{Handlebars, Helper, RenderContext, RenderError};
-use serde_json::to_string_pretty;
-use super::{ChangeLog, OutputPreferences, PostProcessor, Result};
 
 type RenderResult = ::std::result::Result<(), RenderError>;
 

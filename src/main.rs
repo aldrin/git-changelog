@@ -11,14 +11,14 @@ extern crate failure;
 #[macro_use]
 extern crate log;
 
+use changelog::{ChangeLog, Configuration, Result};
 use clap::{App, AppSettings};
-use std::env::args_os;
-use std::ffi::OsString;
-use std::process::exit;
 use console::style;
 use env_logger::LogBuilder;
 use log::{LogLevelFilter, LogRecord};
-use changelog::{ChangeLog, Configuration, Result};
+use std::env::args_os;
+use std::ffi::OsString;
+use std::process::exit;
 
 /// The entry-point.
 fn main() {
@@ -113,8 +113,8 @@ fn initialize_logging(verbosity: u64) {
 
 #[cfg(test)]
 mod tests {
-    use std::ffi::OsString;
     use failure::err_msg;
+    use std::ffi::OsString;
 
     fn to_args(cmd: &str) -> Vec<OsString> {
         cmd.split_whitespace().map(OsString::from).collect()

@@ -2,8 +2,8 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 // Commit fetch and parsing logic
 use git;
-use std::{fmt, str};
 use nom::{is_alphanumeric, IResult};
+use std::{fmt, str};
 
 /// A single commit
 #[derive(Debug, Default, Serialize, Eq, PartialEq)]

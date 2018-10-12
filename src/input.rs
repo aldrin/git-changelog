@@ -1,11 +1,11 @@
 // Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-use std::fs::File;
 use super::Result;
-use std::io::prelude::*;
 use serde_yaml::from_str;
 use std::env::current_dir;
+use std::fs::File;
+use std::io::prelude::*;
 
 /// The YAML configuration file name (`.changelog.yml`).
 ///

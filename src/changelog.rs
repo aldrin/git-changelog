@@ -1,13 +1,13 @@
 // Copyright 2017-2018 by Aldrin J D'Souza.
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
-use git;
-use std::str;
-use commit::{Commit, CommitList, Line};
-use std::collections::HashMap;
-use chrono::MIN_DATE;
 use chrono::prelude::*;
+use chrono::MIN_DATE;
+use commit::{Commit, CommitList, Line};
+use git;
 use input::{Configuration, Conventions};
+use std::collections::HashMap;
+use std::str;
 
 /// A categorized changelog
 #[derive(Debug, Default, Serialize, Eq, PartialEq)]
