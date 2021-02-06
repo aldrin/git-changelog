@@ -30,7 +30,8 @@ pub fn get_commit_message(sha: &str) -> Result<Vec<String>> {
         "--format=format:%H%n%an%n%aD%n%s%n%b",
         "--max-count=1",
         sha,
-    ]).map(|o| read_lines(&o))
+    ])
+    .map(|o| read_lines(&o))
 }
 
 /// Get the fetch url for the given origin
@@ -60,7 +61,8 @@ fn last_tags(n: i32) -> Result<Vec<String>> {
         "--sort=-taggerdate",
         "--format=%(refname:short)",
         "refs/tags/*",
-    ]).map(|o| read_lines(&o))
+    ])
+    .map(|o| read_lines(&o))
 }
 
 /// Invoke a git command with the given arguments.

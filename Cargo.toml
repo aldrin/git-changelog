@@ -11,22 +11,22 @@ keywords    = ["git", "changelog", "report", "project", "status"]
 categories  = ["command-line-utilities", "development-tools"]
 
 [dependencies]
-log          = "0.3"
+log          = "0.4"
 nom          = "3.2"
 chrono       = "0.4"
-regex        = "0.2"
-serde        = "1.0"
+regex        = "1"
+serde        = "1"
 failure      = "0.1"
-console      = "0.6"
+console      = "0.14"
 handlebars   = "0.29"
-env_logger   = "0.3"
-serde_yaml   = "0.7"
-serde_json   = "1.0"
-serde_derive = "1.0"
+env_logger   = "0.8"
+serde_yaml   = "0.8"
+serde_json   = "1"
+serde_derive = "1"
 clap         = { version = "2", features = ["yaml"] }
 
 [dev-dependencies]
-difference   = "1.0"
+difference   = "2"
 
 [lib]
 name = "changelog"
