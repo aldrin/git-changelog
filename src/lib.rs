@@ -97,6 +97,7 @@
 extern crate chrono;
 #[macro_use]
 extern crate anyhow;
+#[cfg(feature = "handlebars")]
 extern crate handlebars;
 #[macro_use]
 extern crate log;
@@ -113,6 +114,8 @@ mod commit;
 mod git;
 mod input;
 mod output;
+#[cfg(feature = "handlebars")]
+mod template_hbs;
 
 pub use changelog::Category;
 pub use changelog::ChangeLog;

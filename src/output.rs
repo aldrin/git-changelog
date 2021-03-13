@@ -2,13 +2,20 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 use super::{ChangeLog, OutputPreferences, PostProcessor, Result};
-use handlebars::{Context, Handlebars, Helper, Output, RenderContext, RenderError};
+#[cfg(feature = "handlebars")]
+use crate::template_hbs::render_template;
 use regex::Regex;
 use serde_json::to_string_pretty;
 /// All output concerns.
 use std::fmt;
 
-type RenderResult = ::std::result::Result<(), RenderError>;
+/// Stub implementation if we're building without handlebars
+#[cfg(not(feature = "handlebars"))]
+fn render_template(_: &str, _: &ChangeLog) -> Result<String> {
+    Err(format_err!(
+        "Built without Handlebars support, must use JSON output"
+    ))
+}
 
 /// Render the changelog with the given output preferences
 pub fn render(clog: &ChangeLog, out: &OutputPreferences) -> Result<String> {
@@ -16,39 +23,11 @@ pub fn render(clog: &ChangeLog, out: &OutputPreferences) -> Result<String> {
     let text = if out.json {
         to_string_pretty(clog).map_err(|e| format_err!("JSON render failed: {}", e))
     } else {
-        let mut hbs = Handlebars::new();
-        hbs.register_helper("tidy-change", Box::new(tidy));
-        hbs.render_template(&out.get_template()?, clog)
-            .map_err(|e| format_err!("Handlebar render failed: {}", e))
+        render_template(&out.get_template()?, clog)
     };
 
     // Run the post processors on the output
     text.map(|s| post_process(&s, &out.post_processors))
-}
-
-/// A handlebar helper to tidy up markdown lists used to render changes.
-fn tidy(
-    h: &Helper,
-    _: &Handlebars,
-    _: &Context,
-    _: &mut RenderContext,
-    out: &mut dyn Output,
-) -> RenderResult {
-    if let Some(indent) = h.param(0).and_then(|v| v.value().as_str()) {
-        if let Some(text) = h.param(1).and_then(|v| v.value().as_str()) {
-            let mut lines = text.lines();
-            if let Some(first) = lines.next() {
-                out.write(first.trim())?;
-                out.write("\n")?;
-            }
-            for line in lines {
-                out.write(indent)?;
-                out.write(line)?;
-                out.write("\n")?;
-            }
-        }
-    }
-    Ok(())
 }
 
 impl fmt::Display for ChangeLog {
