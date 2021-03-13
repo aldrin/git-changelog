@@ -192,76 +192,76 @@ fn parse_line(line: &str) -> Line {
     }
 }
 
-/// A change message line is one of the following types
+// A change message line is one of the following types
 named!(tagged_change<&str, Line>,
-       alt!(with_category
-           | with_category_scope
-           | with_category_text
-           | with_category_scope_text
-           | with_text
-       ));
+alt!(with_category
+    | with_category_scope
+    | with_category_text
+    | with_category_scope_text
+    | with_text
+));
 
-/// A line that has just a simple change (no tags).
+// A line that has just a simple change (no tags).
 named!(with_text<&str, Line>,
-       do_parse!(opt!(tag!("-")) >>
-                 text: whatever >>
-                 (Line{
-                     scope: None,
-                     category: None,
-                     text: Some(text)
-                 })));
+do_parse!(opt!(tag!("-")) >>
+          text: whatever >>
+          (Line{
+              scope: None,
+              category: None,
+              text: Some(text)
+          })));
 
-/// A line that has just a category
+// A line that has just a category
 named!(with_category<&str, Line>,
-       do_parse!(
-           tag!("-") >> category: tagname >>
-               tag!(":") >> eof!() >>
-               (Line{
-                   scope: None,
-                   category: Some(category),
-                   text: None
-               })));
+do_parse!(
+    tag!("-") >> category: tagname >>
+        tag!(":") >> eof!() >>
+        (Line{
+            scope: None,
+            category: Some(category),
+            text: None
+        })));
 
-/// A line that has just a category and scope, but no change text
+// A line that has just a category and scope, but no change text
 named!(with_category_scope<&str, Line>,
-       do_parse!(
-           tag!("-") >> category: tagname >>
-               tag!("(") >> scope: tagname >>
-               tag!("):") >> eof!() >>
-               (Line{
-                   scope: Some(scope),
-                   category: Some(category),
-                   text: None
-               })));
+do_parse!(
+    tag!("-") >> category: tagname >>
+        tag!("(") >> scope: tagname >>
+        tag!("):") >> eof!() >>
+        (Line{
+            scope: Some(scope),
+            category: Some(category),
+            text: None
+        })));
 
-/// A line that has a category and a change text, but no scope.
+// A line that has a category and a change text, but no scope.
 named!(with_category_text<&str, Line>,
-       do_parse!(
-           tag!("-") >> category: tagname >>
-               tag!(":") >> text: whatever >>
-               (Line{
-                   scope: None,
-                   category: Some(category),
-                   text: Some(text)
-               })));
+do_parse!(
+    tag!("-") >> category: tagname >>
+        tag!(":") >> text: whatever >>
+        (Line{
+            scope: None,
+            category: Some(category),
+            text: Some(text)
+        })));
 
-/// A line that has everything, i.e. category, scope and a change.
+// A line that has everything, i.e. category, scope and a change.
 named!(with_category_scope_text<&str, Line>,
-       do_parse!(
-           tag!("-") >> category: tagname >>
-               tag!("(") >> scope: tagname >>
-               tag!("):") >> text: whatever >>
-               (Line{
-                   scope: Some(scope),
-                   category: Some(category),
-                   text: Some(text)
-                })));
+do_parse!(
+    tag!("-") >> category: tagname >>
+        tag!("(") >> scope: tagname >>
+        tag!("):") >> text: whatever >>
+        (Line{
+            scope: Some(scope),
+            category: Some(category),
+            text: Some(text)
+         })));
 
-/// Consume whatever is left and return a String
+// Consume whatever is left and return a String
 named!(whatever<&str, String>,
        map!(take_while1_s!(|_| true), String::from));
 
-/// Consume an acceptable tag name and return a String
+// Consume an acceptable tag name and return a String
 named!(tagname<&str, String>,
        map!(ws!(take_while1_s!(|c| is_alphanumeric(c as u8))), str::to_lowercase));
 
