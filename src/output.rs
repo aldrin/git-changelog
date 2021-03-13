@@ -2,7 +2,7 @@
 // Licensed under the MIT License <https://opensource.org/licenses/MIT>
 
 use super::{ChangeLog, OutputPreferences, PostProcessor, Result};
-use handlebars::{Handlebars, Helper, RenderContext, RenderError};
+use handlebars::{Context, Handlebars, Helper, Output, RenderContext, RenderError};
 use regex::Regex;
 use serde_json::to_string_pretty;
 /// All output concerns.
@@ -18,7 +18,7 @@ pub fn render(clog: &ChangeLog, out: &OutputPreferences) -> Result<String> {
     } else {
         let mut hbs = Handlebars::new();
         hbs.register_helper("tidy-change", Box::new(tidy));
-        hbs.template_render(&out.get_template()?, clog)
+        hbs.render_template(&out.get_template()?, clog)
             .map_err(|e| format_err!("Handlebar render failed: {}", e))
     };
 
@@ -27,15 +27,24 @@ pub fn render(clog: &ChangeLog, out: &OutputPreferences) -> Result<String> {
 }
 
 /// A handlebar helper to tidy up markdown lists used to render changes.
-fn tidy(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> RenderResult {
+fn tidy(
+    h: &Helper,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext,
+    out: &mut dyn Output,
+) -> RenderResult {
     if let Some(indent) = h.param(0).and_then(|v| v.value().as_str()) {
         if let Some(text) = h.param(1).and_then(|v| v.value().as_str()) {
             let mut lines = text.lines();
             if let Some(first) = lines.next() {
-                writeln!(rc.writer, "{}", first.trim())?;
+                out.write(first.trim())?;
+                out.write("\n")?;
             }
             for line in lines {
-                writeln!(rc.writer, "{}{}", indent, line)?;
+                out.write(indent)?;
+                out.write(line)?;
+                out.write("\n")?;
             }
         }
     }
