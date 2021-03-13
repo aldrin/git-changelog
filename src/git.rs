@@ -133,9 +133,11 @@ mod tests {
     #[test]
     fn get_remote_url() {
         use super::get_remote_url;
-        let expected = Some(String::from("https://github.com/aldrin/git-changelog"));
         let found = get_remote_url("origin").unwrap();
         assert!(get_remote_url("bad").is_err());
-        assert_eq!(found, expected);
+        assert!(found.is_some());
+        let found = found.unwrap();
+        assert!(found.starts_with("https://github.com/"));
+        assert!(found.ends_with("/git-changelog"));
     }
 }
