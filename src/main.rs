@@ -5,9 +5,9 @@
 extern crate changelog;
 #[macro_use]
 extern crate clap;
+extern crate anyhow;
 extern crate console;
 extern crate env_logger;
-extern crate failure;
 #[macro_use]
 extern crate log;
 
@@ -122,7 +122,7 @@ fn initialize_logging(verbosity: u64) {
 
 #[cfg(test)]
 mod tests {
-    use failure::err_msg;
+    use anyhow::anyhow;
     use std::ffi::OsString;
 
     fn to_args(cmd: &str) -> Vec<OsString> {
@@ -144,6 +144,6 @@ mod tests {
             0
         );
         assert_eq!(super::show(Ok(String::from("foo"))), 0);
-        assert_eq!(super::show(Err(err_msg("foo"))), 1);
+        assert_eq!(super::show(Err(anyhow!("foo"))), 1);
     }
 }

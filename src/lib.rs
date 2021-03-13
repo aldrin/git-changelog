@@ -96,7 +96,7 @@
 
 extern crate chrono;
 #[macro_use]
-extern crate failure;
+extern crate anyhow;
 extern crate handlebars;
 #[macro_use]
 extern crate log;
@@ -130,4 +130,4 @@ pub use input::CONFIG_FILE;
 pub use input::TEMPLATE_FILE;
 pub use output::render;
 
-pub type Result<T> = std::result::Result<T, failure::Error>;
+pub type Result<T> = std::result::Result<T, anyhow::Error>;
