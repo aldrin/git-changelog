@@ -91,6 +91,24 @@
 //! // Render
 //! assert!(changelog::render(&changelog, &config.output).is_ok());
 //! ```
+//!
+//! # Crate features
+//!
+//! There are two features you can disable when depending on the crate as a library,
+//! which will reduce the additional dependencies you incur:
+//!
+//! - `bin`: Required to compile the standalone executable target
+//! - `handlebars`: Required to render Handlebars templates with `changelog::render`
+//!
+//! To control which of these you take, you can use the following alternative in your Cargo.toml:
+//!
+//! ```toml
+//! [dependencies.git-changelog]
+//! default-features = false
+//! # features = ["handlebars"] # Optionally cherry-pick the `handlebars` support
+//! version = "0.3"
+//! ```
+//!
 //! [revision range]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#double_dot
 //! [README]: https://github.com/aldrin/git-changelog/blob/master/README.md
 
