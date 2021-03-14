@@ -126,11 +126,8 @@ impl ChangeLog {
         }
 
         // Add the remote url, if we have one (it's used by links to commits and PRs)
-        let remote = match config.output.remote {
-            Some(ref r) => r,
-            None => "origin",
-        };
-        changelog.remote_url = git::get_remote_url(remote).unwrap_or(None);
+        let remote = config.output.remote.as_deref().unwrap_or("origin");
+        changelog.remote_url = git::get_remote_url(&remote).unwrap_or(None);
 
         // Add the last change date
         changelog.date = raw.date.format("%Y-%m-%d").to_string();
