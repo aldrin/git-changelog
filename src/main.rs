@@ -130,6 +130,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "handlebars")]
     fn run() {
         assert!(super::run(to_args("git-changelog v0.1.1..v0.2.1")).is_ok());
         assert!(super::run(to_args("git-changelog -d v0.1.1..v0.2.1")).is_ok());
@@ -138,6 +139,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "handlebars")]
     fn show() {
         assert_eq!(
             super::show(super::run(to_args("git-changelog v0.1.1..v0.2.1"))),

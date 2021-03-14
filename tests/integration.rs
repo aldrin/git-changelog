@@ -8,6 +8,7 @@ use changelog::*;
 use regex::Regex;
 
 #[test]
+#[cfg(feature = "handlebars")]
 fn readme_example() {
     let config = builtin_config();
     let commits = vec![readme_commit()];
