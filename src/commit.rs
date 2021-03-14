@@ -68,18 +68,21 @@ impl<T: AsRef<str>> From<T> for Commit {
 
 impl Commit {
     pub fn from_lines(mut lines: Vec<String>) -> Self {
-        let mut commit = Self::default();
-
-        commit.sha = lines.remove(0);
-        commit.author = lines.remove(0);
-        commit.time = lines.remove(0);
-
+        let sha = lines.remove(0);
+        let author = lines.remove(0);
+        let time = lines.remove(0);
         let subject = lines.remove(0);
-        commit.number = parse_number(&subject);
-        commit.summary = parse_subject(&subject);
-        commit.message = lines.join("\n");
-
-        commit
+        let number = parse_number(&subject);
+        let summary = parse_subject(&subject);
+        let message = lines.join("\n");
+        Self {
+            sha,
+            author,
+            time,
+            number,
+            summary,
+            message,
+        }
     }
 }
 
@@ -152,31 +155,22 @@ fn parse_subject(line: &str) -> String {
     let first_open = line.find("(#").unwrap_or_else(|| line.len());
 
     // Everything up to the first number opener is the subject
-    String::from(line.get(0..first_open).unwrap_or_else(|| line).trim())
+    String::from(line.get(0..first_open).unwrap_or(line).trim())
 }
 
 /// Parse the commit number
 fn parse_number(line: &str) -> Option<u32> {
     // The commit number is the last number on the subject
-    let last_open = line.rfind("(#");
+    let last_open = line.rfind("(#").map(|x| x + "(#".len());
 
     // The last number opener
     let last_close = line.rfind(')');
 
-    // If no number found on subject line
-    if last_open.is_none() || last_close.is_none() {
-        // The commit has no number
-        None
+    // If one was found, parse it to a number
+    if let (Some(start), Some(end)) = (last_open, last_close) {
+        line.get(start..end).map(|s| s.parse().ok()).unwrap_or(None)
     } else {
-        // Extract the bounds of the last number
-        let end = last_close.unwrap();
-        let start = last_open.unwrap() + "(#".len();
-
-        // Parse it to a number
-        let num = line.get(start..end).map(|s| s.parse().ok());
-
-        // If valid, we have a number
-        num.unwrap_or(None)
+        None
     }
 }
 
