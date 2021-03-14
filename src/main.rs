@@ -14,10 +14,11 @@ extern crate log;
 use changelog::{ChangeLog, Configuration, Result};
 use clap::{App, AppSettings};
 use console::style;
-use env_logger::LogBuilder;
-use log::{LogLevelFilter, LogRecord};
+use env_logger::{fmt::Formatter, Builder};
+use log::{LevelFilter, Record};
 use std::env::args_os;
 use std::ffi::OsString;
+use std::io::Write;
 use std::process::exit;
 
 /// The entry-point.
@@ -93,22 +94,30 @@ fn show(result: Result<String>) -> i32 {
 fn initialize_logging(verbosity: u64) {
     // Pick the log level
     let level = match verbosity {
-        1 => LogLevelFilter::Info,
-        2 => LogLevelFilter::Debug,
-        n if n > 2 => LogLevelFilter::Trace,
-        _ => LogLevelFilter::Warn,
+        1 => LevelFilter::Info,
+        2 => LevelFilter::Debug,
+        n if n > 2 => LevelFilter::Trace,
+        _ => LevelFilter::Warn,
     };
 
     // Pick the log format
-    let format = |r: &LogRecord| format!("{}: {}", r.level(), r.args());
+    let format = |buf: &mut Formatter, r: &Record| writeln!(buf, "{}: {}", r.level(), r.args());
 
     // Build the logger and initialize
-    LogBuilder::new()
+    let mut builder = Builder::new();
+
+    builder
         .filter(Some("git_changelog"), level)
         .filter(Some("changelog"), level)
-        .format(format)
-        .init()
-        .ok();
+        .format(format);
+
+    // We can't re-initialize the logger, so it's OK if it fails init when running the tests (which will
+    // initialize multiple times).
+    if cfg!(test) {
+        let _ = builder.try_init();
+    } else {
+        builder.init();
+    }
 }
 
 #[cfg(test)]

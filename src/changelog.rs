@@ -117,11 +117,11 @@ impl ChangeLog {
 
                 for category in config.conventions.category_titles() {
                     let title = category.to_owned();
-                    if let Some(mut changes) = categorized.remove(&category) {
+                    if let Some(changes) = categorized.remove(&category) {
                         categories.push(Category { title, changes });
                     }
                 }
-                changelog.scopes.push({ Scope { title, categories } })
+                changelog.scopes.push(Scope { title, categories })
             }
         }
 
@@ -181,7 +181,7 @@ impl<'a> RawReport<'a> {
             if current.text.is_none() {
                 // Initialize it with this line's text
                 current.text = line.text
-            } else if let Some(mut text) = current.text.as_mut() {
+            } else if let Some(text) = current.text.as_mut() {
                 // Append this line text to the current text
                 text.push('\n');
                 text.push_str(&line.text.unwrap_or_default());

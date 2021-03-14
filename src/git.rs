@@ -42,11 +42,25 @@ pub fn get_remote_url(name: &str) -> Result<Option<String>> {
 
 /// Check if the remote URL is usable for links
 fn usable_url(raw: String) -> Option<String> {
-    if raw.to_lowercase().starts_with("http") {
+    let raw_lowercase = raw.to_lowercase();
+    if raw_lowercase.starts_with("http") {
         if let Some(index) = raw.rfind(".git") {
             return Some(raw[0..index].to_string());
         } else {
             return Some(raw);
+        }
+    } else {
+        let ssh_prefix = "git@github.com:";
+        if raw_lowercase.starts_with(ssh_prefix) {
+            let path = &raw[ssh_prefix.len()..];
+            let path = if raw_lowercase.ends_with(".git") {
+                &path[..path.len() - 4]
+            } else {
+                path
+            };
+            let mut github_url = String::from("https://github.com/");
+            github_url.push_str(path);
+            return Some(github_url);
         }
     }
     None
@@ -127,15 +141,17 @@ mod tests {
         let usable = "https://github.com/aldrin/git-changelog";
         assert_eq!(usable_url(usable.to_string()), Some(usable.to_string()));
         assert_eq!(usable_url(raw), Some(usable.to_string()));
-        assert_eq!(usable_url(ssh), None);
+        assert_eq!(usable_url(ssh), Some(usable.to_string()));
     }
 
     #[test]
     fn get_remote_url() {
         use super::get_remote_url;
-        let expected = Some(String::from("https://github.com/aldrin/git-changelog"));
         let found = get_remote_url("origin").unwrap();
         assert!(get_remote_url("bad").is_err());
-        assert_eq!(found, expected);
+        assert!(found.is_some());
+        let found = found.unwrap();
+        assert!(found.starts_with("https://github.com/"));
+        assert!(found.ends_with("/git-changelog"));
     }
 }

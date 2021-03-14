@@ -2,8 +2,10 @@ extern crate changelog;
 extern crate difference;
 extern crate env_logger;
 extern crate log;
+extern crate regex;
 
 use changelog::*;
+use regex::Regex;
 
 #[test]
 fn readme_example() {
@@ -13,7 +15,13 @@ fn readme_example() {
     log.range = String::from("1d82af9^..1d82af9");
     let md = render(&log, &config.output).unwrap();
     let expected = include_str!("../src/assets/sample.md");
-    let diff = difference::Changeset::new(expected, &md, " ");
+
+    // Remove the repo URL so this passes when checking out from a different repo
+    let url_regex = Regex::new("https://github.com/[^/]+/git-changelog").unwrap();
+    let expected = url_regex.replace_all(expected, "<repo url>");
+    let md = url_regex.replace_all(&md, "<repo url>");
+
+    let diff = difference::Changeset::new(&expected, &md, " ");
     assert_eq!(diff.diffs.len(), 1, "{:#?}", diff.diffs);
 }
 
